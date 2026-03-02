@@ -7,14 +7,12 @@ RUN corepack enable
 WORKDIR /app
 
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY . .
 
 RUN pnpm install --frozen-lockfile
-
-WORKDIR /app/servers/mumu
-
-COPY . .
 
 ENV NODE_ENV=production
 EXPOSE 3000
 
+WORKDIR /app/servers/mumu
 CMD ["pnpm", "start"]
