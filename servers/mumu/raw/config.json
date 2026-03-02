@@ -1,0 +1,23 @@
+{
+  "admins": [
+    {
+      "github": "wuzoo",
+      "slack": "최주용"
+    },
+    {
+      "github": "namdaeun",
+      "slack": "남다은"
+    },
+    {
+      "github": "constantly-dev",
+      "slack": "이진혁"
+    }
+  ],
+  "repos": [
+    "makers-devops",
+    "sopt-playground-frontend",
+    "sopt-crew-frontend",
+    "sopt-operation-frontend",
+    "sopt-recruiting-frontend"
+  ]
+}
