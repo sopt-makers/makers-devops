@@ -5,16 +5,10 @@ import { createWebhookRouter } from "./webhook";
 async function main() {
   const app = express();
 
-  app.use(
-    express.json({
-      verify: (req: any, _res, buf) => {
-        req.rawBody = buf.toString("utf-8");
-      },
-    }),
-  );
+  /** 요청 JSON 바디 파싱 */
+  app.use(express.json());
 
-  const webhookRouter = createWebhookRouter();
-  app.use("/api", webhookRouter);
+  app.use("/api", createWebhookRouter());
 
   app.get("/health", (_req, res) => {
     res.status(200).json({ status: "ok" });
