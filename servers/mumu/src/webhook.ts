@@ -28,7 +28,7 @@ const handlePullRequest = async (req: Request, res: Response) => {
   /** 백그라운드에서 알림 전송/리뷰어 지정 (not await) */
   Promise.all([
     slackNotifier.notifyReviewerAssigned({
-      repo: result.data.repository.full_name,
+      repo: repoName,
       prNumber: result.data.pull_request.number,
       prTitle: result.data.pull_request.title,
       prUrl: result.data.pull_request.html_url,

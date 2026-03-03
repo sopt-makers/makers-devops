@@ -12,7 +12,7 @@ export class SlackNotifier {
     const mentions = params.reviewers.map((r) => `<@${r.slack}>`).join(", ");
 
     const text = [
-      `*[${params.repo}] PR 리뷰어가 지정되었어요* 👀`,
+      `*[${params.repo}]에서 PR이 올라왔어요!* 👀`,
       `> *PR:* <${params.prUrl}|#${params.prNumber} ${params.prTitle}>`,
       `> *작성자:* ${params.author}`,
       `> *리뷰어:* ${mentions}`,
