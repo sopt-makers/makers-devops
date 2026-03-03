@@ -44,6 +44,9 @@ importers:
       tsx:
         specifier: ^4.19.0
         version: 4.21.0
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
     devDependencies:
       '@types/express':
         specifier: ^5.0.0
@@ -891,6 +894,9 @@ packages:
     engines: {node: '>= 14.6'}
     hasBin: true
 
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+
 snapshots:
 
   '@biomejs/biome@2.4.4':
@@ -1701,3 +1707,5 @@ snapshots:
       strip-ansi: 7.2.0
 
   yaml@2.8.2: {}
+
+  zod@4.3.6: {}

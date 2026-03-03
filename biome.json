@@ -7,7 +7,7 @@
   },
   "assist": { "actions": { "source": { "organizeImports": "off" } } },
   "formatter": {
-    "includes": ["**", "!**/package.json", "!**/public/**/*", "!**/schema.json", "!**/Dockerfile"],
+    "includes": ["**", "!**/public/**/*", "!**/schema.json", "!**/Dockerfile"],
     "enabled": true,
     "indentStyle": "space",
     "lineEnding": "lf",
