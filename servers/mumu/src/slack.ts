@@ -18,7 +18,7 @@ export class SlackNotifier {
     ].join("\n");
 
     await this.client.chat.postMessage({
-      channel: "#general",
+      channel: "#프론트엔드-bot",
       text,
     });
   }
