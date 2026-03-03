@@ -4,6 +4,7 @@ import { selectReviewers } from "./reviewer";
 import { createSlackNotifier } from "./slack";
 import { assertNonNullish } from "./util";
 import { pullRequestSchema } from "./schema";
+import { assignReviewers } from "./github";
 
 const slackNotifier = createSlackNotifier(process.env.SLACK_BOT_TOKEN ?? "");
 const config = loadConfig();
@@ -24,15 +25,22 @@ const handlePullRequest = async (req: Request, res: Response) => {
 
   const reviewers = selectReviewers(config.admins, result.data.pull_request.user.login, 2);
 
-  /** 백그라운드에서 notification 전송 (not await) */
-  slackNotifier.notifyReviewerAssigned({
-    repo: result.data.repository.full_name,
-    prNumber: result.data.pull_request.number,
-    prTitle: result.data.pull_request.title,
-    prUrl: result.data.pull_request.html_url,
-    reviewers,
-    author: result.data.pull_request.user.login,
-  });
+  /** 백그라운드에서 알림 전송/리뷰어 지정 (not await) */
+  Promise.all([
+    slackNotifier.notifyReviewerAssigned({
+      repo: result.data.repository.full_name,
+      prNumber: result.data.pull_request.number,
+      prTitle: result.data.pull_request.title,
+      prUrl: result.data.pull_request.html_url,
+      reviewers,
+      author: result.data.pull_request.user.login,
+    }),
+    assignReviewers(
+      repoName,
+      result.data.pull_request.number,
+      reviewers.map((r) => r.github),
+    ),
+  ]);
 
   return res.status(200).json({ success: true, message: "Pull request processed successfully" });
 };

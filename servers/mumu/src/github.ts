@@ -11,5 +11,6 @@ export async function assignReviewers(repo: string, prNumber: number, reviewers:
     pull_number: prNumber,
     reviewers,
   });
+
   return response;
 }
