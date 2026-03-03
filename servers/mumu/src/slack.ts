@@ -9,7 +9,8 @@ export class SlackNotifier {
   }
 
   async notifyReviewerAssigned(params: ReviewerAssignedParams): Promise<void> {
-    const mentions = params.reviewers.map((r) => `@${r.slack}`).join(", ");
+    const mentions = params.reviewers.map((r) => `<@${r.slack}>`).join(", ");
+
     const text = [
       `*[${params.repo}] PR 리뷰어가 지정되었어요* 👀`,
       `> *PR:* <${params.prUrl}|#${params.prNumber} ${params.prTitle}>`,
