@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const pullRequestSchema = z.object({
-  action: z.string(), // opened, reopened ..
+  action: z.enum(["opened", "reopened"]),
   pull_request: z.object({
     number: z.number(),
     title: z.string(),
