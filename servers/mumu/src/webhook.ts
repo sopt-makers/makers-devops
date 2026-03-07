@@ -20,11 +20,9 @@ export function createWebhookRouter(): Router {
   router.post("/webhook", async (req: Request, res: Response) => {
     const event = req.headers["x-github-event"];
 
-    const pullRequestResult = await handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier);
-
     switch (event) {
       case "pull_request":
-        res.status(200).send(pullRequestResult);
+        res.status(200).send(await handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier));
         break;
       default:
         res.status(200).send("OK");

@@ -3,7 +3,7 @@ import { z } from "zod";
 export type PullRequest = z.infer<typeof pullRequestSchema>;
 
 export const pullRequestSchema = z.object({
-  action: z.enum(["opened", "reopened", "closed"]),
+  action: z.string(),
   pull_request: z.object({
     number: z.number(),
     title: z.string(),
