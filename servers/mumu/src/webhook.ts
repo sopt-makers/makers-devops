@@ -24,17 +24,17 @@ const handlePullRequest = async (req: Request, res: Response) => {
   }
 
   const reviewers = selectReviewers(config.admins, result.data.pull_request.user.login, 2);
+  const mentions = reviewers.map((r) => `<@${r.slack}>`).join(", ");
+  const text = [
+    `*[${repoName}]에서 PR이 올라왔어요!* 👀`,
+    `> *PR:* <${result.data.pull_request.html_url}|#${result.data.pull_request.number} ${result.data.pull_request.title}>`,
+    `> *작성자:* ${result.data.pull_request.user.login}`,
+    `> *리뷰어:* ${mentions}`,
+  ].join("\n");
 
   /** 백그라운드에서 알림 전송/리뷰어 지정 (not await) */
   Promise.all([
-    slackNotifier.notifyReviewerAssigned({
-      repo: repoName,
-      prNumber: result.data.pull_request.number,
-      prTitle: result.data.pull_request.title,
-      prUrl: result.data.pull_request.html_url,
-      reviewers,
-      author: result.data.pull_request.user.login,
-    }),
+    slackNotifier.notify(text),
     assignReviewers(
       repoName,
       result.data.pull_request.number,
@@ -45,10 +45,15 @@ const handlePullRequest = async (req: Request, res: Response) => {
   return res.status(200).json({ success: true, message: "Pull request processed successfully" });
 };
 
+export const FRONTEND_BOT_CHANNEL = "#프론트엔드-bot";
+
 export function createWebhookRouter(): Router {
   assertNonNullish(process.env.SLACK_BOT_TOKEN, "SLACK_BOT_TOKEN 환경변수가 누락되었어요.");
 
   const router = Router();
+
+  /** 채널 연결 */
+  slackNotifier.init({ channel: FRONTEND_BOT_CHANNEL });
 
   router.post("/webhook", async (req: Request, res: Response) => {
     const event = req.headers["x-github-event"];

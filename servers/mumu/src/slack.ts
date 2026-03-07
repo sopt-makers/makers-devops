@@ -1,25 +1,27 @@
 import { WebClient } from "@slack/web-api";
-import type { ReviewerAssignedParams } from "./types";
+import { assertNonNullish } from "./util";
+
+type SlackInitializeOptions = {
+  channel: string;
+};
 
 export class SlackNotifier {
   private client: WebClient;
+  private channel = "#프론트엔드-bot";
 
   constructor(token: string) {
     this.client = new WebClient(token);
   }
 
-  async notifyReviewerAssigned(params: ReviewerAssignedParams): Promise<void> {
-    const mentions = params.reviewers.map((r) => `<@${r.slack}>`).join(", ");
+  init({ channel }: SlackInitializeOptions): void {
+    this.channel = channel;
+  }
 
-    const text = [
-      `*[${params.repo}]에서 PR이 올라왔어요!* 👀`,
-      `> *PR:* <${params.prUrl}|#${params.prNumber} ${params.prTitle}>`,
-      `> *작성자:* ${params.author}`,
-      `> *리뷰어:* ${mentions}`,
-    ].join("\n");
+  async notify(text: string): Promise<void> {
+    assertNonNullish(this.channel, "채널이 설정되지 않았어요");
 
     await this.client.chat.postMessage({
-      channel: "#프론트엔드-bot",
+      channel: this.channel,
       text,
     });
   }
