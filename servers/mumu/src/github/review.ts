@@ -17,7 +17,7 @@ export async function assignReviewers(repo: string, prNumber: number, reviewers:
   return response;
 }
 
-export function selectReviewers(admins: AdminUser[], excludeUser: string, count = 2): AdminUser[] {
+export function selectReviewers(admins: AdminUser[], excludeUser: string, count = 3): AdminUser[] {
   const candidates = admins.filter((admin) => admin.github !== excludeUser);
 
   // Fisher-Yates shuffle
