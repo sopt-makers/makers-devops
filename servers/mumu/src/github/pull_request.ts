@@ -1,18 +1,12 @@
-import { loadConfig } from "../config";
+import { config, validateRepository } from "../config";
 import { assignReviewers, selectReviewers } from "./review";
 import type { PullRequest } from "../schema";
 import { threadStorage } from "../webhook";
 import type { SlackNotifier } from "../slack";
 
-const config = loadConfig();
-
 export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier: SlackNotifier) => {
   const repoName = pullRequest.repository.full_name.split("/")[1];
-
-  /** 등록된 repo인지에 대한 검증 */
-  if (!config.repos.includes(repoName)) {
-    return JSON.stringify({ success: false, error: "Repository not registered, skipping." });
-  }
+  const validRepo = validateRepository(repoName);
 
   const reviewers = selectReviewers(config.admins, pullRequest.pull_request.user.login, 2);
   const mentions = reviewers.map((r) => `<@${r.slack}>`).join(", ");
@@ -27,7 +21,7 @@ export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier:
   const [threadResponse] = await Promise.all([
     slackNotifier.createThread(text),
     assignReviewers(
-      repoName,
+      validRepo,
       pullRequest.pull_request.number,
       reviewers.map((r) => r.github),
     ),
