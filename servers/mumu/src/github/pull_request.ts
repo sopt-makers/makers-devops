@@ -13,18 +13,16 @@ export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier:
 
   /** PR이 closed/merged 된 경우 */
   if (pullRequest.action === "closed") {
-    if (!pullRequest.pull_request.merged) {
-      return JSON.stringify({ success: true, message: "Pull request closed without merge, skipping." });
-    }
-
     const thread = threadStorage.get(repoFullName, prNumber);
+    const isMerged = pullRequest.pull_request.merged === true;
+    const replyText = isMerged ? "🎉 PR이 머지되었습니다." : "🚫 PR이 닫혔습니다.";
 
     if (thread?.threadTs) {
-      await slackNotifier.createThreadReply(thread.threadTs, "🕊️ PR이 머지되었습니다.");
+      await slackNotifier.createThreadReply(thread.threadTs, replyText);
     }
 
     threadStorage.delete(repoFullName, prNumber);
-    return JSON.stringify({ success: true, message: "Pull request merged." });
+    return JSON.stringify({ success: true, message: isMerged ? "Pull request merged." : "Pull request closed." });
   }
 
   const reviewers = selectReviewers(config.admins, pullRequest.pull_request.user.login, 2);
