@@ -5,6 +5,7 @@ import { createSlackNotifier } from "./slack";
 import { assertNonNullish } from "./util";
 import { pullRequestSchema } from "./schema";
 import { assignReviewers } from "./github";
+import { FRONTEND_BOT_CHANNEL } from "./constant";
 
 const slackNotifier = createSlackNotifier(process.env.SLACK_BOT_TOKEN ?? "");
 const config = loadConfig();
@@ -44,8 +45,6 @@ const handlePullRequest = async (req: Request, res: Response) => {
 
   return res.status(200).json({ success: true, message: "Pull request processed successfully" });
 };
-
-export const FRONTEND_BOT_CHANNEL = "#프론트엔드-bot";
 
 export function createWebhookRouter(): Router {
   assertNonNullish(process.env.SLACK_BOT_TOKEN, "SLACK_BOT_TOKEN 환경변수가 누락되었어요.");
