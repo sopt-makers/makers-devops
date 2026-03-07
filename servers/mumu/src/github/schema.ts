@@ -4,7 +4,7 @@ export type PullRequest = z.infer<typeof pullRequestSchema>;
 export type PullRequestReviewComment = z.infer<typeof pullRequestReviewCommentSchema>;
 
 export const pullRequestSchema = z.object({
-  action: z.enum(["opened", "reopened", "closed"]),
+  action: z.string(),
   pull_request: z.object({
     number: z.number(),
     title: z.string(),

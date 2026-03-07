@@ -22,16 +22,13 @@ export function createWebhookRouter(): Router {
 
     switch (event) {
       case "pull_request": {
-        const result = await handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier);
-        res.status(200).send(result);
+        res.status(200).send(await handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier));
         break;
       }
       case "pull_request_review_comment": {
-        const result = await handlePullRequestReviewComment(
-          pullRequestReviewCommentSchema.parse(req.body),
-          slackNotifier,
-        );
-        res.status(200).send(result);
+        res
+          .status(200)
+          .send(await handlePullRequestReviewComment(pullRequestReviewCommentSchema.parse(req.body), slackNotifier));
         break;
       }
       default:
