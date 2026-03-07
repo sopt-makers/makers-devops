@@ -23,7 +23,7 @@ export const handlePullRequestReviewComment = async (
   const thread = threadStorage.get(repoFullName, prNumber);
 
   const preview = truncateBody(payload.comment.body);
-  const text = `*${payload.comment.user.login}*: <${payload.comment.html_url}|${preview}>`;
+  const text = [`> *${payload.comment.user.login}*`, `> <${payload.comment.html_url}|${preview}>`].join("\n");
 
   if (thread?.threadTs) {
     await slackNotifier.createThreadReply(thread.threadTs, text);
