@@ -1,4 +1,4 @@
-import type { ChatPostMessageResponseMessage } from "@slack/web-api/dist/types/response/ChatPostMessageResponse";
+import type { ChatPostMessageResponse } from "@slack/web-api";
 
 export type AdminUser = {
   github: string;
@@ -28,5 +28,5 @@ export interface SlackThread {
   ok: boolean;
   channel?: string;
   threadTs?: string;
-  message?: ChatPostMessageResponseMessage;
+  message?: ChatPostMessageResponse["message"];
 }
