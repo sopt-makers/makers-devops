@@ -15,6 +15,7 @@
   ],
   "repos": [
     "makers-devops",
+    "sopt-makers-frontend",
     "sopt-playground-frontend",
     "sopt-crew-frontend",
     "sopt-operation-frontend",
