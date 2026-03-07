@@ -1,10 +1,11 @@
 import { Router, type Request, type Response } from "express";
 import { createSlackNotifier } from "./slack";
 import { assertNonNullish } from "./util";
-import { pullRequestSchema } from "./github/schema";
+import { pullRequestSchema, pullRequestReviewCommentSchema } from "./github/schema";
 import { FRONTEND_BOT_CHANNEL } from "./constant";
 import { createThreadStorage } from "./storage";
 import { handlePullRequest } from "./github/pull_request";
+import { handlePullRequestReviewComment } from "./github/comment";
 
 export const threadStorage = createThreadStorage();
 
@@ -14,18 +15,25 @@ export function createWebhookRouter(): Router {
 
   const router = Router();
 
-  /** 채널 연결 */
   slackNotifier.init({ channel: FRONTEND_BOT_CHANNEL });
 
   router.post("/webhook", async (req: Request, res: Response) => {
     const event = req.headers["x-github-event"];
 
-    const pullRequestResult = await handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier);
-
     switch (event) {
-      case "pull_request":
-        res.status(200).send(pullRequestResult);
+      case "pull_request": {
+        const result = await handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier);
+        res.status(200).send(result);
         break;
+      }
+      case "pull_request_review_comment": {
+        const result = await handlePullRequestReviewComment(
+          pullRequestReviewCommentSchema.parse(req.body),
+          slackNotifier,
+        );
+        res.status(200).send(result);
+        break;
+      }
       default:
         res.status(200).send("OK");
         break;
