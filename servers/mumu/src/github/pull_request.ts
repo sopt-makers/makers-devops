@@ -15,7 +15,7 @@ export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier:
   if (pullRequest.action === "closed") {
     const thread = threadStorage.get(repoFullName, prNumber);
     const isMerged = pullRequest.pull_request.merged === true;
-    const replyText = isMerged ? "🎉 PR이 머지되었습니다." : "🚫 PR이 닫혔습니다.";
+    const replyText = `> ${isMerged ? "🎉 *PR이 머지되었어요.*" : "🚫 *PR이 닫혔어요."}`;
 
     if (thread?.threadTs) {
       await slackNotifier.createThreadReply(thread.threadTs, replyText);
