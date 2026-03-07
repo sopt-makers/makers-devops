@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { createSlackNotifier } from "./slack";
 import { assertNonNullish } from "./util";
-import { pullRequestSchema } from "./schema";
+import { pullRequestSchema } from "./github/schema";
 import { FRONTEND_BOT_CHANNEL } from "./constant";
 import { createThreadStorage } from "./storage";
 import { handlePullRequest } from "./github/pull_request";

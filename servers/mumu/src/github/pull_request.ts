@@ -1,6 +1,6 @@
 import { config, validateRepository } from "../config";
 import { assignReviewers, selectReviewers } from "./review";
-import type { PullRequest } from "../schema";
+import type { PullRequest } from "./schema";
 import { threadStorage } from "../webhook";
 import type { SlackNotifier } from "../slack";
 
