@@ -1,4 +1,4 @@
-import { WebClient } from "@slack/web-api";
+import { WebClient, type ChatPostMessageArguments, type ChatPostMessageResponse } from "@slack/web-api";
 import { assertNonNullish } from "./util";
 
 type SlackInitializeOptions = {
@@ -17,13 +17,25 @@ export class SlackNotifier {
     this.channel = channel;
   }
 
-  async notify(text: string): Promise<void> {
-    assertNonNullish(this.channel, "채널이 설정되지 않았어요");
-
-    await this.client.chat.postMessage({
+  async createThread(text: string): Promise<ChatPostMessageResponse> {
+    return await this.notify({
       channel: this.channel,
       text,
     });
+  }
+
+  async createThreadReply(threadTs: string, text: string): Promise<ChatPostMessageResponse> {
+    return await this.notify({
+      channel: this.channel,
+      thread_ts: threadTs,
+      text,
+    });
+  }
+
+  private async notify(option: ChatPostMessageArguments): Promise<ChatPostMessageResponse> {
+    assertNonNullish(this.channel, "채널이 설정되지 않았어요");
+
+    return await this.client.chat.postMessage(option);
   }
 }
 

@@ -1,7 +1,9 @@
 import { z } from "zod";
 
+export type PullRequest = z.infer<typeof pullRequestSchema>;
+
 export const pullRequestSchema = z.object({
-  action: z.enum(["opened", "reopened"]),
+  action: z.enum(["opened", "reopened", "closed"]),
   pull_request: z.object({
     number: z.number(),
     title: z.string(),
@@ -20,6 +22,7 @@ export const pullRequestSchema = z.object({
     user: z.object({
       login: z.string(),
     }),
+    merged: z.boolean().optional(),
   }),
   repository: z.object({
     full_name: z.string(),
