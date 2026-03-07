@@ -5,30 +5,49 @@ import { threadStorage } from "../webhook";
 import type { SlackNotifier } from "../slack";
 
 export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier: SlackNotifier) => {
-  const repoName = pullRequest.repository.full_name.split("/")[1];
+  const repoFullName = pullRequest.repository.full_name;
+  const repoName = repoFullName.split("/")[1];
+  const prNumber = pullRequest.pull_request.number;
+
   const validRepo = validateRepository(repoName);
+
+  /** PR이 closed/merged 된 경우 */
+  if (pullRequest.action === "closed") {
+    if (!pullRequest.pull_request.merged) {
+      return JSON.stringify({ success: true, message: "Pull request closed without merge, skipping." });
+    }
+
+    const thread = threadStorage.get(repoFullName, prNumber);
+
+    if (thread?.threadTs) {
+      await slackNotifier.createThreadReply(thread.threadTs, "🕊️ PR이 머지되었습니다.");
+    }
+
+    threadStorage.delete(repoFullName, prNumber);
+    return JSON.stringify({ success: true, message: "Pull request merged." });
+  }
 
   const reviewers = selectReviewers(config.admins, pullRequest.pull_request.user.login, 2);
   const mentions = reviewers.map((r) => `<@${r.slack}>`).join(", ");
   const text = [
-    `*[${pullRequest.repository.full_name}]에서 PR이 올라왔어요!* 👀`,
-    `> *PR:* <${pullRequest.pull_request.html_url}|#${pullRequest.pull_request.number} ${pullRequest.pull_request.title}>`,
+    `*[${repoFullName}]에서 PR이 올라왔어요!* 👀`,
+    `> *PR:* <${pullRequest.pull_request.html_url}|#${prNumber} ${pullRequest.pull_request.title}>`,
     `> *작성자:* ${pullRequest.pull_request.user.login}`,
     `> *리뷰어:* ${mentions}`,
   ].join("\n");
 
-  /** 백그라운드에서 알림 전송/리뷰어 지정 (not await) */
-  const [threadResponse] = await Promise.all([
-    slackNotifier.createThread(text),
-    assignReviewers(
-      validRepo,
-      pullRequest.pull_request.number,
-      reviewers.map((r) => r.github),
-    ),
-  ]);
+  /** 백그라운드에서 리뷰어 지정 (not await) */
+  assignReviewers(
+    validRepo,
+    prNumber,
+    reviewers.map((r) => r.github),
+  );
+
+  /** 스레드 생성 */
+  const threadResponse = await slackNotifier.createThread(text);
 
   /** 스레드 정보 저장 */
-  threadStorage.set(pullRequest, {
+  threadStorage.set(repoFullName, prNumber, {
     ok: threadResponse.ok,
     channel: threadResponse.channel,
     threadTs: threadResponse.ts,
