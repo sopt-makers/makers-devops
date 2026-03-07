@@ -1,4 +1,4 @@
-import type { PullRequest } from "./schema";
+import type { PullRequest } from "./github/schema";
 import type { SlackThread } from "./types";
 
 /** pull_request - thread map store */
