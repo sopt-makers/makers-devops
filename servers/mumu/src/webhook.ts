@@ -9,9 +9,8 @@ import { handlePullRequest } from "./github/pull_request";
 export const threadStorage = createThreadStorage();
 
 export function createWebhookRouter(): Router {
-  const slackNotifier = createSlackNotifier(process.env.SLACK_BOT_TOKEN ?? "");
-
   assertNonNullish(process.env.SLACK_BOT_TOKEN, "SLACK_BOT_TOKEN 환경변수가 누락되었어요.");
+  const slackNotifier = createSlackNotifier(process.env.SLACK_BOT_TOKEN);
 
   const router = Router();
 
