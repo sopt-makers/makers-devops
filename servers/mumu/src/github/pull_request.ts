@@ -4,7 +4,14 @@ import type { PullRequest } from "./schema";
 import { threadStorage } from "../webhook";
 import type { SlackNotifier } from "../slack";
 
+type HandledAction = (typeof HANDLED_ACTIONS)[number];
+const HANDLED_ACTIONS = ["opened", "reopened", "closed"] as const;
+
 export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier: SlackNotifier) => {
+  if (!HANDLED_ACTIONS.includes(pullRequest.action as HandledAction)) {
+    return JSON.stringify({ success: true, message: "Action skipped." });
+  }
+
   const repoFullName = pullRequest.repository.full_name;
   const repoName = repoFullName.split("/")[1];
   const prNumber = pullRequest.pull_request.number;
