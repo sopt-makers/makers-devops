@@ -32,7 +32,7 @@ export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier:
     return JSON.stringify({ success: true, message: isMerged ? "Pull request merged." : "Pull request closed." });
   }
 
-  const reviewers = selectReviewers(config.admins, pullRequest.pull_request.user.login, 2);
+  const reviewers = selectReviewers(config.admins, pullRequest.pull_request.user.login, 3);
   const mentions = reviewers.map((r) => `<@${r.slack}>`).join(", ");
   const text = [
     `*[${repoFullName}]에서 PR이 올라왔어요!* 👀`,
