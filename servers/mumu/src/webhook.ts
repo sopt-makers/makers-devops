@@ -20,20 +20,26 @@ export function createWebhookRouter(): Router {
   router.post("/webhook", async (req: Request, res: Response) => {
     const event = req.headers["x-github-event"];
 
-    switch (event) {
-      case "pull_request": {
-        res.status(200).send(await handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier));
-        break;
+    /**
+     * Webhook API는 10초 동안 응답하지 않으면 delivery하지 않음
+     * 각 핸들러들을 백그라운드에서 실행하고 바로 응답
+     */
+    res.status(200).send("Webhook received");
+    try {
+      switch (event) {
+        case "pull_request": {
+          const result = handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier);
+          console.log(`Pull Request: ${JSON.parse(result)}`);
+          break;
+        }
+        case "pull_request_review_comment": {
+          const result = handlePullRequestReviewComment(pullRequestReviewCommentSchema.parse(req.body), slackNotifier);
+          console.log(`Pull Request Review Comment: ${JSON.parse(result)}`);
+          break;
+        }
       }
-      case "pull_request_review_comment": {
-        res
-          .status(200)
-          .send(await handlePullRequestReviewComment(pullRequestReviewCommentSchema.parse(req.body), slackNotifier));
-        break;
-      }
-      default:
-        res.status(200).send("OK");
-        break;
+    } catch (err) {
+      console.error(`${event} Error:`, err);
     }
   });
 

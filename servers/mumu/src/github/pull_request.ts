@@ -7,9 +7,9 @@ import type { SlackNotifier } from "../slack";
 type HandledAction = (typeof HANDLED_ACTIONS)[number];
 const HANDLED_ACTIONS = ["opened", "reopened", "closed"] as const;
 
-export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier: SlackNotifier) => {
+export const handlePullRequest = (pullRequest: PullRequest, slackNotifier: SlackNotifier) => {
   if (!HANDLED_ACTIONS.includes(pullRequest.action as HandledAction)) {
-    return JSON.stringify({ success: true, message: "Action skipped." });
+    return JSON.stringify({ success: true, message: "Pull request action skipped." });
   }
 
   const repoFullName = pullRequest.repository.full_name;
@@ -24,12 +24,14 @@ export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier:
     const isMerged = pullRequest.pull_request.merged === true;
     const replyText = `> ${isMerged ? "🎉 *PR이 머지되었어요.*" : "🚫 *PR이 닫혔어요.*"}`;
 
-    if (thread?.threadTs) {
-      await slackNotifier.createThreadReply(thread.threadTs, replyText);
+    if (!thread?.threadTs) {
+      console.warn(`[pull_request] threadTs not found for ${repoFullName}#${prNumber} — server may have restarted`);
+    } else {
+      slackNotifier.createThreadReply(thread.threadTs, replyText);
     }
 
     threadStorage.delete(repoFullName, prNumber);
-    return JSON.stringify({ success: true, message: isMerged ? "Pull request merged." : "Pull request closed." });
+    return JSON.stringify({ success: true, message: "Pull request closed." });
   }
 
   const reviewers = selectReviewers(config.admins, pullRequest.pull_request.user.login, 3);
@@ -49,14 +51,14 @@ export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier:
   );
 
   /** 스레드 생성 */
-  const threadResponse = await slackNotifier.createThread(text);
-
-  /** 스레드 정보 저장 */
-  threadStorage.set(repoFullName, prNumber, {
-    ok: threadResponse.ok,
-    channel: threadResponse.channel,
-    threadTs: threadResponse.ts,
-    message: threadResponse.message,
+  slackNotifier.createThread(text).then((response) => {
+    /** 스레드 정보 저장 */
+    threadStorage.set(repoFullName, prNumber, {
+      ok: response.ok,
+      channel: response.channel,
+      threadTs: response.ts,
+      message: response.message,
+    });
   });
 
   return JSON.stringify({ success: true, message: "Pull request processed successfully" });

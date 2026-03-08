@@ -10,10 +10,7 @@ const truncateBody = (body: string): string => {
   return `${twoLines.slice(0, MAX_CHARS)}...`;
 };
 
-export const handlePullRequestReviewComment = async (
-  payload: PullRequestReviewComment,
-  slackNotifier: SlackNotifier,
-) => {
+export const handlePullRequestReviewComment = (payload: PullRequestReviewComment, slackNotifier: SlackNotifier) => {
   if (payload.action !== "created") {
     return JSON.stringify({ success: true, message: "Review comment action skipped." });
   }
@@ -25,9 +22,14 @@ export const handlePullRequestReviewComment = async (
   const preview = truncateBody(payload.comment.body);
   const text = [`> *${payload.comment.user.login}*`, `> <${payload.comment.html_url}|${preview}>`].join("\n");
 
-  if (thread?.threadTs) {
-    await slackNotifier.createThreadReply(thread.threadTs, text);
+  if (!thread?.threadTs) {
+    return JSON.stringify({
+      success: false,
+      message: `Review comment thread not found for ${repoFullName}#${prNumber}`,
+    });
   }
 
-  return JSON.stringify({ success: true, message: "Review comment notification sent." });
+  slackNotifier.createThreadReply(thread.threadTs, text);
+
+  return JSON.stringify({ success: true, message: "Review comment processed successfully" });
 };
