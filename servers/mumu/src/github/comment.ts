@@ -1,5 +1,6 @@
-import { threadStorage } from "../webhook";
+import { redisStorage } from "../redis";
 import type { SlackNotifier } from "../slack";
+import type { SlackThread } from "../types";
 import type { PullRequestReviewComment } from "./schema";
 
 const MAX_CHARS = 200;
@@ -10,26 +11,35 @@ const truncateBody = (body: string): string => {
   return `${twoLines.slice(0, MAX_CHARS)}...`;
 };
 
-export const handlePullRequestReviewComment = (payload: PullRequestReviewComment, slackNotifier: SlackNotifier) => {
+export const handlePullRequestReviewComment = async (
+  payload: PullRequestReviewComment,
+  slackNotifier: SlackNotifier,
+) => {
   if (payload.action !== "created") {
-    return JSON.stringify({ success: true, message: "Review comment action skipped." });
+    return JSON.stringify({ success: false, message: "Review comment action skipped." });
   }
 
   const repoFullName = payload.repository.full_name;
   const prNumber = payload.pull_request.number;
-  const thread = threadStorage.get(repoFullName, prNumber);
+  const cacheKey = `${repoFullName}#${prNumber}`;
 
-  const preview = truncateBody(payload.comment.body);
-  const text = [`> *${payload.comment.user.login}*`, `> <${payload.comment.html_url}|${preview}>`].join("\n");
+  const thread = await redisStorage.get<SlackThread>(cacheKey);
 
   if (!thread?.threadTs) {
     return JSON.stringify({
       success: false,
-      message: `Review comment thread not found for ${repoFullName}#${prNumber}`,
+      message: `${cacheKey}/${thread?.channel}: threadTs를 찾을 수 없어요.`,
     });
   }
 
-  slackNotifier.createThreadReply(thread.threadTs, text);
+  const preview = truncateBody(payload.comment.body);
+  const text = [`> *${payload.comment.user.login}*`, `> <${payload.comment.html_url}|${preview}>`].join("\n");
+
+  try {
+    await slackNotifier.createThreadReply(thread.threadTs, text);
+  } catch {
+    console.error(`${cacheKey}/${thread.channel}: review comment 슬랙 스레드 답변 전송 실패`);
+  }
 
   return JSON.stringify({ success: true, message: "Review comment processed successfully" });
 };

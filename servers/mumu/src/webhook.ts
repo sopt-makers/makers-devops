@@ -28,21 +28,18 @@ export function createWebhookRouter(): Router {
      * 각 핸들러들을 백그라운드에서 실행하고 바로 응답
      */
     res.status(200).send("Webhook received");
-    try {
-      switch (event) {
-        case "pull_request": {
-          handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier).then((res) => console.log(res));
-          break;
-        }
-        case "pull_request_review_comment": {
-          handlePullRequestReviewComment(pullRequestReviewCommentSchema.parse(req.body), slackNotifier).then((res) =>
-            console.log(res),
-          );
-          break;
-        }
+
+    switch (event) {
+      case "pull_request": {
+        handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier).then((res) => console.log(res));
+        break;
       }
-    } catch (err) {
-      console.error(`${event} Error:`, err);
+      case "pull_request_review_comment": {
+        handlePullRequestReviewComment(pullRequestReviewCommentSchema.parse(req.body), slackNotifier).then((res) =>
+          console.log(res),
+        );
+        break;
+      }
     }
   });
 
