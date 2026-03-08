@@ -20,13 +20,6 @@ GitHub Webhook을 수신해 PR 생성, 리뷰 코멘트 등의 이벤트를 Slac
 - **Linter / Formatter**: Biome
 - **Git Hooks**: Husky + lint-staged
 
-## 기여
-
-PR 생성 시 `create-devops-pr` 스킬을 활용할 수 있습니다.
-devops 모노레포 내 변경사항에 적합한 PR을 자동 생성합니다.
-
-스킬 이름을 그대로 입력하거나, "PR 생성해줘"와 같이 요청 가능합니다.
-
 ## Skills
 
 AI Agent가 활용할 수 있는 스킬 목록입니다. `.agents/skills/` 디렉토리에서 관리됩니다.
