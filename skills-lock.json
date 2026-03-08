@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "toss-frontend-fundamentals": {
+      "source": "leekensei/agent-skills",
+      "sourceType": "github",
+      "computedHash": "225666efc9645ba1d4af0fa5ab9947ba7aa32c9a4efe8b45440f70d8ef639202"
+    }
+  }
+}
