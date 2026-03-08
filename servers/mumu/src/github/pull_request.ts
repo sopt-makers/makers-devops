@@ -1,13 +1,35 @@
-import { config, validateRepository } from "../config";
+import { config } from "../config";
 import { assignReviewers, selectReviewers } from "./review";
 import type { PullRequest } from "./schema";
-import { threadStorage } from "../webhook";
 import type { SlackNotifier } from "../slack";
+import { redisStorage } from "../redis";
+import type { SlackThread } from "../types";
 
 type HandledAction = (typeof HANDLED_ACTIONS)[number];
 const HANDLED_ACTIONS = ["opened", "reopened", "closed"] as const;
 
-export const handlePullRequest = (pullRequest: PullRequest, slackNotifier: SlackNotifier) => {
+const handlePullRequestClosed = async (pullRequest: PullRequest, slackNotifier: SlackNotifier) => {
+  const cacheKey = `${pullRequest.repository.full_name}#${pullRequest.pull_request.number}`;
+  const thread = await redisStorage.get<SlackThread>(cacheKey);
+
+  const isMerged = pullRequest.pull_request.merged === true;
+  const replyText = `> ${isMerged ? "🎉 *PR이 머지되었어요.*" : "🚫 *PR이 닫혔어요.*"}`;
+
+  if (!thread?.threadTs) {
+    console.warn(`${cacheKey}/${thread?.channel}: threadTs를 찾을 수 없어요.`);
+  } else {
+    try {
+      await slackNotifier.createThreadReply(thread.threadTs, replyText);
+    } catch {
+      console.error(`${cacheKey}/${thread.channel}: 슬랙 스레드 답변 전송 실패`);
+    }
+  }
+
+  redisStorage.delete(cacheKey);
+  return JSON.stringify({ success: true, message: "Pull request closed." });
+};
+
+export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier: SlackNotifier) => {
   if (!HANDLED_ACTIONS.includes(pullRequest.action as HandledAction)) {
     return JSON.stringify({ success: true, message: "Pull request action skipped." });
   }
@@ -16,22 +38,11 @@ export const handlePullRequest = (pullRequest: PullRequest, slackNotifier: Slack
   const repoName = repoFullName.split("/")[1];
   const prNumber = pullRequest.pull_request.number;
 
-  const validRepo = validateRepository(repoName);
+  const cacheKey = `${repoFullName}#${prNumber}`;
 
   /** PR이 closed/merged 된 경우 */
   if (pullRequest.action === "closed") {
-    const thread = threadStorage.get(repoFullName, prNumber);
-    const isMerged = pullRequest.pull_request.merged === true;
-    const replyText = `> ${isMerged ? "🎉 *PR이 머지되었어요.*" : "🚫 *PR이 닫혔어요.*"}`;
-
-    if (!thread?.threadTs) {
-      console.warn(`[pull_request] threadTs not found for ${repoFullName}#${prNumber} — server may have restarted`);
-    } else {
-      slackNotifier.createThreadReply(thread.threadTs, replyText);
-    }
-
-    threadStorage.delete(repoFullName, prNumber);
-    return JSON.stringify({ success: true, message: "Pull request closed." });
+    return await handlePullRequestClosed(pullRequest, slackNotifier);
   }
 
   const authorLogin = pullRequest.pull_request.user.login;
@@ -49,21 +60,26 @@ export const handlePullRequest = (pullRequest: PullRequest, slackNotifier: Slack
 
   /** 백그라운드에서 리뷰어 지정 (not await) */
   assignReviewers(
-    validRepo,
+    repoName,
     prNumber,
     reviewers.map((r) => r.github),
   );
 
-  /** 스레드 생성 */
-  slackNotifier.createThread(text).then((response) => {
-    /** 스레드 정보 저장 */
-    threadStorage.set(repoFullName, prNumber, {
-      ok: response.ok,
-      channel: response.channel,
-      threadTs: response.ts,
-      message: response.message,
-    });
-  });
+  try {
+    const response = await slackNotifier.createThread(text);
+    await redisStorage.set<SlackThread>(
+      cacheKey,
+      {
+        ok: response.ok,
+        channel: response.channel,
+        threadTs: response.ts,
+        message: response.message,
+      },
+      { ex: 60 * 60 * 24 * 21 },
+    );
+  } catch {
+    console.error(`${cacheKey}: 슬랙 스레드 생성 실패`);
+  }
 
   return JSON.stringify({ success: true, message: "Pull request processed successfully" });
 };
