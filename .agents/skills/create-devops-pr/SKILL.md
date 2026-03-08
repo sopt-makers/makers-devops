@@ -29,14 +29,14 @@ devops 모노레포에서 일관된 형식의 PR을 생성한다.
 
 scope는 변경된 파일이 속한 **루트 하위 디렉토리명**을 그대로 사용한다. 이 모노레포는 `servers/` 외에도 다양한 루트 디렉토리가 추가될 수 있다.
 
-| 변경 경로 예시                                         | scope     |
-| ------------------------------------------------------ | --------- |
-| `servers/mumu/...`                                     | `mumu`    |
-| `servers/api/...`                                      | `api`     |
-| `workers/batch/...`                                    | `batch`   |
-| `libs/shared/...`                                      | `shared`  |
-| `scripts/deploy/...`                                   | `scripts` |
-| 루트 파일(`package.json`, `.github/`, `biome.json` 등) | `root`    |
+| 변경 경로 예시                                         | scope    |
+| ------------------------------------------------------ | -------- |
+| `servers/mumu/...`                                     | `mumu`   |
+| `servers/api/...`                                      | `api`    |
+| `workers/batch/...`                                    | `batch`  |
+| `libs/shared/...`                                      | `shared` |
+| `scripts/deploy/...`                                   | `deploy` |
+| 루트 파일(`package.json`, `.github/`, `biome.json` 등) | `root`   |
 
 - 루트 디렉토리가 `servers`, `workers` 같은 **그룹 디렉토리**인 경우, 그 안의 실제 패키지명을 scope로 쓴다 (예: `servers/mumu` → `mumu`)
 - 그룹 디렉토리 자체가 무엇인지 불분명한 경우에만 사용자에게 확인한다
