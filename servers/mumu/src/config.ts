@@ -18,11 +18,6 @@ export function loadConfig(): Config {
 
 export const config = loadConfig();
 
-export function validateRepository(repo: string): string {
-  const matchedRepo = config.repos.find((_repo: string) => _repo === repo);
-  if (!matchedRepo) {
-    throw new Error(`${repo}를 찾지 못했어요.`);
-  }
-
-  return matchedRepo;
+export function isValidRepository(repo: string) {
+  return config.repos.includes(repo);
 }
