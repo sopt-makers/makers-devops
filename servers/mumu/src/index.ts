@@ -4,31 +4,32 @@ import { createWebhookRouter } from "./webhook";
 import { redisStorage } from "./redis";
 import { assertNonNullish } from "./util";
 
-async function main() {
-  const app = express();
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled rejection:", reason);
+});
 
-  assertNonNullish(process.env.UPSTASH_REDIS_REST_URL, "UPSTASH_REDIS_REST_URL is not set");
-  assertNonNullish(process.env.UPSTASH_REDIS_REST_TOKEN, "UPSTASH_REDIS_REST_TOKEN is not set");
+const app = express();
 
-  redisStorage.register({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-    retry: 3,
-  });
+assertNonNullish(process.env.UPSTASH_REDIS_REST_URL, "UPSTASH_REDIS_REST_URL is not set");
+assertNonNullish(process.env.UPSTASH_REDIS_REST_TOKEN, "UPSTASH_REDIS_REST_TOKEN is not set");
 
-  /** 요청 JSON 바디 파싱 */
-  app.use(express.json());
+redisStorage.register({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  retry: 3,
+});
 
-  app.use("/api", createWebhookRouter());
+/** 요청 JSON 바디 파싱 */
+app.use(express.json());
 
-  app.get("/health", (_req, res) => {
-    res.status(200).json({ status: "ok" });
-  });
+app.use("/api", createWebhookRouter());
 
-  const port = process.env.PORT || 3000;
-  app.listen(port, () => {
-    console.log(`mumu server running on port:${port}`);
-  });
-}
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
 
-main();
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  console.log(`mumu server running on port:${port}`);
+});
