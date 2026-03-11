@@ -19,26 +19,26 @@ export const createRedisStorage = (): RedisStorage => {
         },
       });
     },
-    get: async (key) => {
+    get: (key) => {
       if (!redisInstance) {
         throw new Error("Redis instance is not set");
       }
 
-      return await redisInstance.get(key);
+      return redisInstance.get(key);
     },
-    set: async (key, value, options) => {
+    set: (key, value, options) => {
       if (!redisInstance) {
         throw new Error("Redis instance is not set");
       }
 
-      await redisInstance.set(key, value, options);
+      return redisInstance.set(key, value, options);
     },
-    delete: async (key) => {
+    delete: (key) => {
       if (!redisInstance) {
         throw new Error("Redis instance is not set");
       }
 
-      await redisInstance.del(key);
+      return redisInstance.del(key);
     },
   };
 };
