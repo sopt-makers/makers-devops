@@ -67,6 +67,11 @@ export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier:
 
   try {
     const response = await slackNotifier.createThread(text);
+
+    if (!response.ts) {
+      console.error(`${cacheKey}: Slack 스레드 생성 응답에 ts가 없어요 (ok: ${response.ok})`);
+      return JSON.stringify({ success: false, message: "Slack thread ts missing" });
+    }
     await redisStorage.set<SlackThread>(
       cacheKey,
       {
