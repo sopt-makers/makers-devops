@@ -18,6 +18,8 @@ export function loadConfig(): Config {
 
 export const config = loadConfig();
 
-export function isValidRepository(repo: string) {
+export function isValidRepository(repo: string | null | undefined) {
+  if (repo == null) return false;
+
   return config.repos.includes(repo);
 }

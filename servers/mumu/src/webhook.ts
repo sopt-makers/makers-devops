@@ -18,7 +18,8 @@ export function createWebhookRouter(): Router {
   router.post("/webhook", async (req: Request, res: Response) => {
     const event = req.headers["x-github-event"];
 
-    const repository = req.body.repository.full_name;
+    const repository = req.body?.repository?.full_name;
+
     if (!isValidRepository(repository)) {
       return res.status(400).json({ error: `Invalid repository: ${repository}` });
     }
