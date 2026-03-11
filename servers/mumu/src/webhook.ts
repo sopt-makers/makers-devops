@@ -18,10 +18,11 @@ export function createWebhookRouter(): Router {
   router.post("/webhook", async (req: Request, res: Response) => {
     const event = req.headers["x-github-event"];
 
-    const repository = req.body?.repository?.full_name;
+    const fullName: string | undefined = req.body?.repository?.full_name;
+    const repoName = fullName?.split("/")[1];
 
-    if (!isValidRepository(repository)) {
-      return res.status(400).json({ error: `Invalid repository: ${repository}` });
+    if (!isValidRepository(repoName)) {
+      return res.status(400).json({ error: `Invalid repository: ${fullName}` });
     }
 
     /**
@@ -30,17 +31,21 @@ export function createWebhookRouter(): Router {
      */
     res.status(200).send("Webhook received");
 
-    switch (event) {
-      case "pull_request": {
-        handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier).then((res) => console.log(res));
-        break;
+    try {
+      switch (event) {
+        case "pull_request": {
+          handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier).then((res) => console.log(res));
+          break;
+        }
+        case "pull_request_review_comment": {
+          handlePullRequestReviewComment(pullRequestReviewCommentSchema.parse(req.body), slackNotifier).then((res) =>
+            console.log(res),
+          );
+          break;
+        }
       }
-      case "pull_request_review_comment": {
-        handlePullRequestReviewComment(pullRequestReviewCommentSchema.parse(req.body), slackNotifier).then((res) =>
-          console.log(res),
-        );
-        break;
-      }
+    } catch (err) {
+      console.error(`[${event}] webhook 처리 실패:`, err);
     }
   });
 
