@@ -28,7 +28,7 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
-const port = process.env.PORT || 3000;
+const port = Number(process.env.PORT) || 3000;
 
 app.listen(port, () => {
   console.log(`mumu server running on port:${port}`);
