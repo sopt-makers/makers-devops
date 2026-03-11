@@ -25,7 +25,9 @@ const handlePullRequestClosed = async (pullRequest: PullRequest, slackNotifier: 
     }
   }
 
-  redisStorage.delete(cacheKey);
+  await redisStorage.delete(cacheKey).catch((err) => {
+    console.log(`${cacheKey}: Redis 캐시 삭제 실패`, err);
+  });
   return JSON.stringify({ success: true, message: "Pull request closed." });
 };
 
@@ -63,7 +65,9 @@ export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier:
     repoName,
     prNumber,
     reviewers.map((r) => r.github),
-  );
+  ).catch((err) => {
+    console.log(`${cacheKey}: 리뷰어 지정 실패`, err);
+  });
 
   try {
     const response = await slackNotifier.createThread(text);
