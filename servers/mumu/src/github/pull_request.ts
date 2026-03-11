@@ -34,12 +34,16 @@ export const handlePullRequest = (pullRequest: PullRequest, slackNotifier: Slack
     return JSON.stringify({ success: true, message: "Pull request closed." });
   }
 
-  const reviewers = selectReviewers(config.admins, pullRequest.pull_request.user.login, 3);
+  const authorLogin = pullRequest.pull_request.user.login;
+  const author = config.admins.find((admin) => admin.github === authorLogin);
+  const authorMention = author ? `<@${author.slack}>` : authorLogin;
+
+  const reviewers = selectReviewers(config.admins, authorLogin, 3);
   const mentions = reviewers.map((r) => `<@${r.slack}>`).join(", ");
   const text = [
     `*[${repoFullName}]에서 PR이 올라왔어요!* 👀`,
     `> *PR:* <${pullRequest.pull_request.html_url}|#${prNumber} ${pullRequest.pull_request.title}>`,
-    `> *작성자:* ${pullRequest.pull_request.user.login}`,
+    `> *작성자:* ${authorMention}`,
     `> *리뷰어:* ${mentions}`,
   ].join("\n");
 
