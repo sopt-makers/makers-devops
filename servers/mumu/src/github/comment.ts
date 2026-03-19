@@ -11,6 +11,9 @@ const truncateBody = (body: string): string => {
   return `${twoLines.slice(0, MAX_CHARS)}...`;
 };
 
+const escapeSlackLinkText = (text: string): string =>
+  text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
 export const handlePullRequestReviewComment = async (
   payload: PullRequestReviewComment,
   slackNotifier: SlackNotifier,
@@ -33,7 +36,8 @@ export const handlePullRequestReviewComment = async (
   }
 
   const preview = truncateBody(payload.comment.body);
-  const text = [`> *${payload.comment.user.login}*`, `> <${payload.comment.html_url}|${preview}>`].join("\n");
+  const safePreview = escapeSlackLinkText(preview);
+  const text = [`> *${payload.comment.user.login}*`, `> <${payload.comment.html_url}|${safePreview}>`].join("\n");
 
   try {
     await slackNotifier.createThreadReply(thread.threadTs, text);
