@@ -1,5 +1,5 @@
 import { WebClient, type ChatPostMessageArguments, type ChatPostMessageResponse } from "@slack/web-api";
-import { assertNonNullish } from "./util";
+import { assertNonNullish } from "./utils/assert";
 
 type SlackInitializeOptions = {
   channel: string;
