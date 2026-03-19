@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { createWebhookRouter } from "./webhook";
 import { redisStorage } from "./redis";
-import { assertNonNullish } from "./util";
+import { assertNonNullish } from "./utils/assert";
 
 process.on("unhandledRejection", (reason) => {
   console.error("Unhandled rejection:", reason);
