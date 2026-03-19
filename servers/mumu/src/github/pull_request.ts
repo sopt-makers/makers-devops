@@ -1,5 +1,6 @@
 import { config } from "../config";
 import { assignReviewers, selectReviewers } from "./review";
+import { assignAuthorAsAssignee } from "./assignee";
 import type { PullRequest } from "./schema";
 import type { SlackNotifier } from "../slack";
 import { redisStorage } from "../redis";
@@ -63,13 +64,16 @@ export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier:
     `> *리뷰어:* ${mentions}`,
   ].join("\n");
 
-  /** 백그라운드에서 리뷰어 지정 (not await) */
-  assignReviewers(
-    repoName,
-    prNumber,
-    reviewers.map((r) => r.github),
-  ).catch((err) => {
-    console.log(`${cacheKey}: 리뷰어 지정 실패`, err);
+  /** 백그라운드에서 리뷰어/작성자 지정 (not await) */
+  Promise.all([
+    assignReviewers(
+      repoName,
+      prNumber,
+      reviewers.map((r) => r.github),
+    ),
+    assignAuthorAsAssignee(repoName, prNumber, authorLogin),
+  ]).catch((err) => {
+    console.log(`${cacheKey}: 리뷰어/작성자 지정 실패`, err);
   });
 
   try {
