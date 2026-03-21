@@ -1,0 +1,13 @@
+{
+  "name": "@makers-devops/shared",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "packageManager": "pnpm@10.22.0"
+}
