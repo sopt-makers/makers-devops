@@ -52,7 +52,7 @@ export const issueCommentSchema = z.object({
   action: z.enum(["created", "edited", "deleted"]),
   issue: z.object({
     number: z.number(),
-    pull_request: z.object({}).passthrough().optional(),
+    pull_request: z.looseObject({}).optional(),
   }),
   comment: z.object({
     body: z.string(),
