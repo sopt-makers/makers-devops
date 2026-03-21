@@ -1,7 +1,7 @@
 import { redisStorage } from "../redis";
 import type { SlackNotifier } from "../slack";
 import type { SlackThread } from "../types";
-import type { PullRequestReviewComment } from "./schema";
+import type { Comment } from "./schema";
 
 const MAX_CHARS = 200;
 
@@ -14,18 +14,31 @@ const truncateBody = (body: string): string => {
 const escapeSlackLinkText = (text: string): string =>
   text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-export const handlePullRequestReviewComment = async (
-  payload: PullRequestReviewComment,
-  slackNotifier: SlackNotifier,
-) => {
+function buildCommentMessage(payload: Comment): string {
+  const preview = truncateBody(payload.comment.body);
+  const safePreview = escapeSlackLinkText(preview);
+
+  return [`> *${payload.comment.user.login}*`, `> <${payload.comment.html_url}|${safePreview}>`].join("\n");
+}
+
+export const handleComment = async (payload: Comment, slackNotifier: SlackNotifier): Promise<string> => {
   if (payload.action !== "created") {
-    return JSON.stringify({ success: false, message: "Review comment action skipped." });
+    return JSON.stringify({ success: false, message: "Comment action skipped." });
   }
 
   const repoFullName = payload.repository.full_name;
-  const prNumber = payload.pull_request.number;
-  const cacheKey = `${repoFullName}#${prNumber}`;
+  let prNumber: number;
 
+  if ("issue" in payload) {
+    if (!payload.issue.pull_request) {
+      return JSON.stringify({ success: false, message: "Issue comment (not PR); skipped." });
+    }
+    prNumber = payload.issue.number;
+  } else {
+    prNumber = payload.pull_request.number;
+  }
+
+  const cacheKey = `${repoFullName}#${prNumber}`;
   const thread = await redisStorage.get<SlackThread>(cacheKey);
 
   if (!thread?.threadTs) {
@@ -35,15 +48,14 @@ export const handlePullRequestReviewComment = async (
     });
   }
 
-  const preview = truncateBody(payload.comment.body);
-  const safePreview = escapeSlackLinkText(preview);
-  const text = [`> *${payload.comment.user.login}*`, `> <${payload.comment.html_url}|${safePreview}>`].join("\n");
+  const text = buildCommentMessage(payload);
 
   try {
     await slackNotifier.createThreadReply(thread.threadTs, text);
   } catch {
-    console.error(`${cacheKey}/${thread.channel}: review comment 슬랙 스레드 답변 전송 실패`);
+    console.error(`${cacheKey}/${thread.channel}: 슬랙 스레드 답변 전송 실패`);
+    return JSON.stringify({ success: false, message: "Slack thread reply failed" });
   }
 
-  return JSON.stringify({ success: true, message: "Review comment processed successfully" });
+  return JSON.stringify({ success: true, message: "Comment processed successfully" });
 };

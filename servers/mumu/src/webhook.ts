@@ -1,10 +1,10 @@
 import { Router, type Request, type Response } from "express";
 import { createSlackNotifier } from "./slack";
 import { assertNonNullish } from "./utils/assert";
-import { pullRequestSchema, pullRequestReviewCommentSchema } from "./github/schema";
+import { pullRequestSchema, commentSchema } from "./github/schema";
 import { FRONTEND_BOT_CHANNEL } from "./constant";
 import { handlePullRequest } from "./github/pull_request";
-import { handlePullRequestReviewComment } from "./github/comment";
+import { handleComment } from "./github/comment";
 import { isValidRepository } from "./config";
 
 export function createWebhookRouter(): Router {
@@ -37,10 +37,9 @@ export function createWebhookRouter(): Router {
           handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier).then((res) => console.log(res));
           break;
         }
-        case "pull_request_review_comment": {
-          handlePullRequestReviewComment(pullRequestReviewCommentSchema.parse(req.body), slackNotifier).then((res) =>
-            console.log(res),
-          );
+        case "pull_request_review_comment":
+        case "issue_comment": {
+          handleComment(commentSchema.parse(req.body), slackNotifier).then((res) => console.log(res));
           break;
         }
       }
