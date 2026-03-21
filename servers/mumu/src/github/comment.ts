@@ -54,6 +54,7 @@ export const handleComment = async (payload: Comment, slackNotifier: SlackNotifi
     await slackNotifier.createThreadReply(thread.threadTs, text);
   } catch {
     console.error(`${cacheKey}/${thread.channel}: 슬랙 스레드 답변 전송 실패`);
+    return JSON.stringify({ success: false, message: "Slack thread reply failed" });
   }
 
   return JSON.stringify({ success: true, message: "Comment processed successfully" });
