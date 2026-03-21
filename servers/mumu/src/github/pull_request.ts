@@ -65,7 +65,7 @@ export const handlePullRequest = async (pullRequest: PullRequest, slackNotifier:
   ].join("\n");
 
   /** 백그라운드에서 리뷰어/작성자 지정 (not await) */
-  Promise.all([
+  Promise.allSettled([
     assignReviewers(
       repoName,
       prNumber,
