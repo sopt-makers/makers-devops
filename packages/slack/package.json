@@ -1,0 +1,17 @@
+{
+  "name": "@makers-devops/slack",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@slack/web-api": "^7.0.0",
+    "zod": "^4.3.6"
+  },
+  "packageManager": "pnpm@10.22.0"
+}
