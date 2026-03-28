@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "type": "module",
   "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
   "exports": {
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@upstash/redis": "^1.36.3"
+    "@upstash/redis": "^1.36.3",
+    "@makers-devops/shared": "workspace:*"
   },
   "packageManager": "pnpm@10.22.0"
 }
