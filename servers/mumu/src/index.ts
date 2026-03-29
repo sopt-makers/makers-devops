@@ -9,8 +9,16 @@ process.on("unhandledRejection", (reason) => {
 
 const app = express();
 
-assertNonNullish(process.env.UPSTASH_REDIS_REST_URL, "UPSTASH_REDIS_REST_URL is not set");
-assertNonNullish(process.env.UPSTASH_REDIS_REST_TOKEN, "UPSTASH_REDIS_REST_TOKEN is not set");
+const necessaryEnvVars = [
+  "UPSTASH_REDIS_REST_URL",
+  "UPSTASH_REDIS_REST_TOKEN",
+  "SLACK_BOT_TOKEN",
+  "GITHUB_TOKEN",
+] as const;
+
+for (const envVar of necessaryEnvVars) {
+  assertNonNullish(process.env[envVar], `${envVar} is not set`);
+}
 
 /** 요청 JSON 바디 파싱 */
 app.use(express.json());

@@ -1,13 +1,10 @@
 import { Router, type Request, type Response } from "express";
-import { assertNonNullish } from "@makers-devops/shared";
 import { pullRequestSchema, pullRequestReviewCommentSchema } from "@makers-devops/github";
 import { handlePullRequest } from "./handler/pull_request";
 import { handlePullRequestReviewComment } from "./handler/pull_request-review-comment";
 import { isValidRepository } from "./config";
 
 export function createWebhookRouter(): Router {
-  assertNonNullish(process.env.SLACK_BOT_TOKEN, "SLACK_BOT_TOKEN 환경변수가 누락되었어요.");
-
   const router = Router();
 
   router.post("/webhook", async (req: Request, res: Response) => {
