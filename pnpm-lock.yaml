@@ -27,6 +27,12 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  packages/figma:
+    dependencies:
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+
   packages/github:
     dependencies:
       '@octokit/rest':
@@ -64,6 +70,9 @@ importers:
 
   packages/slack-blocks:
     dependencies:
+      '@makers-devops/figma':
+        specifier: workspace:*
+        version: link:../figma
       '@makers-devops/github':
         specifier: workspace:*
         version: link:../github
@@ -73,6 +82,9 @@ importers:
 
   servers/mumu:
     dependencies:
+      '@makers-devops/figma':
+        specifier: workspace:*
+        version: link:../../packages/figma
       '@makers-devops/github':
         specifier: workspace:*
         version: link:../../packages/github
