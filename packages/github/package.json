@@ -1,0 +1,17 @@
+{
+  "name": "@makers-devops/github",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "schema": "./src/schema/index.ts"
+  },
+  "dependencies": {
+    "@octokit/rest": "^21.0.0",
+    "zod": "^4.3.6"
+  },
+  "packageManager": "pnpm@10.22.0"
+}
