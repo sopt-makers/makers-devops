@@ -1,5 +1,5 @@
 import type { PullRequestReviewComment } from "@makers-devops/github";
-import { createPullRequestReviewCommentReply } from "../slack";
+import { createPullRequestReviewCommentReply } from "../../slack";
 
 export const handlePullRequestReviewComment = async (payload: PullRequestReviewComment) => {
   if (payload.action !== "created") {

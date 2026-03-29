@@ -1,11 +1,11 @@
 import type { PullRequest } from "@makers-devops/github";
-import { createPullRequestThread } from "../slack";
-import { getPullRequestThreadKey } from "../slack/key";
+import { createPullRequestThread } from "../../slack";
+import { getPullRequestThreadKey } from "../../slack/key";
 import { deleteSlackThreadData, findSlackThread, slackClient } from "@makers-devops/slack";
 import { PR_닫힘 } from "@makers-devops/slack-blocks";
-import { assignReviewersAndAssignee } from "../github";
-import { selectReviewers } from "../github/review";
-import { config } from "../config";
+import { assignReviewersAndAssignee } from "../../github";
+import { selectReviewers } from "../../github/review";
+import { config } from "../../config";
 
 type HandledAction = (typeof HANDLED_ACTIONS)[number];
 const HANDLED_ACTIONS = ["opened", "reopened", "closed"] as const;
