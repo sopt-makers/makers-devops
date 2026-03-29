@@ -1,13 +1,9 @@
-import { Octokit } from "@octokit/rest";
+import { githubClient } from "@makers-devops/github";
 import { MAKERS_OWNER } from "../constant";
 import type { AdminUser } from "../types";
 
-export const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN,
-});
-
 export async function assignReviewers(repo: string, prNumber: number, reviewers: string[]) {
-  const response = await octokit.pulls.requestReviewers({
+  const response = await githubClient.pulls.requestReviewers({
     owner: MAKERS_OWNER,
     repo,
     pull_number: prNumber,
