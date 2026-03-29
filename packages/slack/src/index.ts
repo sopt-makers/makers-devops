@@ -33,7 +33,7 @@ export const createSlackThread = async (id: string, _message: SlackThreadMessage
         channel: response.channel ?? _message.channel,
         thread_ts: response.ts ?? "",
       };
-      setSlackThreadData(id, data);
+      await setSlackThreadData(id, data, _message.ex ? { ex: _message.ex } : undefined);
 
       return data;
     }
