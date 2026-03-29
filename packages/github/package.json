@@ -7,7 +7,7 @@
     "typecheck": "tsc --noEmit"
   },
   "exports": {
-    "schema": "./src/schema/index.ts"
+    ".": "./src/index.ts"
   },
   "dependencies": {
     "@octokit/rest": "^21.0.0",
