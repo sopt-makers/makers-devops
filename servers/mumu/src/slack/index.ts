@@ -1,0 +1,57 @@
+import { createSlackThread, findSlackThread, slackClient } from "@makers-devops/slack";
+import { getPullRequestThreadKey } from "./key";
+import type { PullRequest, PullRequestReviewComment } from "@makers-devops/github";
+import { FRONTEND_BOT_CHANNEL } from "../constant";
+import { PR_리뷰, PR_열림 } from "@makers-devops/slack-blocks";
+import { getReviewers } from "../global/reviewer";
+
+/** PR에 대한 스레드를 생성합니다. */
+export const createPullRequestThread = async (pull: PullRequest) => {
+  const key = getPullRequestThreadKey(pull);
+
+  const result = await createSlackThread(key, {
+    channel: FRONTEND_BOT_CHANNEL,
+    message: PR_열림.slackPayload(pull, {
+      authorMention: `<@${pull.pull_request.user.login}>`,
+      reviewerMentions: getReviewers()
+        .map((reviewer) => `<@${reviewer.slack}>`)
+        .join(", "),
+    }),
+    ex: 60 * 60 * 24 * 21,
+  });
+
+  return result;
+};
+
+/** PR 스레드에 대한 스레드 reply를 생성합니다. */
+export const createPullRequestReviewCommentReply = async (comment: PullRequestReviewComment) => {
+  const key = getPullRequestThreadKey(comment);
+  const thread = await findSlackThread(key);
+
+  if (!thread) {
+    console.error(`${key}: Slack thread not found`);
+    return null;
+  }
+
+  try {
+    const response = await slackClient.chat.postMessage({
+      channel: thread.channel,
+      thread_ts: thread.thread_ts,
+      ...PR_리뷰.slackPayload(comment),
+    });
+
+    if (!response.ok) {
+      console.error(`${key}: Slack thread reply failed`);
+      return null;
+    }
+
+    return {
+      id: key,
+      channel: thread.channel,
+      thread_ts: response.ts,
+    };
+  } catch {
+    console.error(`${key}: Slack thread reply failed`);
+  }
+  return null;
+};
