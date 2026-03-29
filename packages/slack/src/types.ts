@@ -1,3 +1,4 @@
+import type { KnownBlock } from "@slack/types";
 import { z } from "zod";
 
 /** Storage에 저장되는 스레드 데이터 스키마 */
@@ -8,11 +9,16 @@ export const slackThreadDataSchema = z.object({
   thread_ts: z.string(),
 });
 
-/** 슬랙 메시지 스키마 */
-export const slackThreadMessageSchema = z.object({
-  channel: z.string(),
-  thread_ts: z.string().optional(),
-});
+export type SlackMessage = {
+  text: string;
+  blocks?: KnownBlock[];
+};
 
-export type SlackThreadMessage = z.infer<typeof slackThreadMessageSchema> & { text: string };
+export type SlackThreadMessage = {
+  channel: string;
+  message: SlackMessage;
+  /** expiresIn: storage 저장 기간(초) */
+  ex?: number;
+};
+
 export type SlackThreadData = z.infer<typeof slackThreadDataSchema>;
