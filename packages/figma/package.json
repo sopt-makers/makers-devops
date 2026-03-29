@@ -1,5 +1,5 @@
 {
-  "name": "@makers-devops/slack-blocks",
+  "name": "@makers-devops/figma",
   "version": "1.0.0",
   "type": "module",
   "private": true,
@@ -10,9 +10,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@makers-devops/github": "workspace:*",
-    "@makers-devops/figma": "workspace:*",
-    "@slack/types": "^2.19.0"
+    "zod": "^4.3.6"
   },
   "packageManager": "pnpm@10.22.0"
 }
