@@ -1,0 +1,17 @@
+{
+  "name": "@makers-devops/slack-blocks",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@makers-devops/github": "workspace:*",
+    "@slack/types": "^2.19.0"
+  },
+  "packageManager": "pnpm@10.22.0"
+}
