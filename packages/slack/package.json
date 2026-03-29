@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@makers-devops/redis": "workspace:*",
+    "@slack/types": "^2.19.0",
     "@slack/web-api": "^7.0.0",
     "zod": "^4.3.6"
   },
