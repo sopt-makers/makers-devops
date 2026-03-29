@@ -13,6 +13,7 @@
     "@makers-devops/slack": "workspace:*",
     "@makers-devops/shared": "workspace:*",
     "@makers-devops/github": "workspace:*",
+    "@makers-devops/figma": "workspace:*",
     "@makers-devops/slack-blocks": "workspace:*",
     "@slack/web-api": "^7.0.0",
     "dotenv": "^16.4.0",

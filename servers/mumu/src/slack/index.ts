@@ -1,7 +1,7 @@
 import { createSlackThread, findSlackThread, slackClient } from "@makers-devops/slack";
 import { getPullRequestThreadKey } from "./key";
 import type { PullRequest, PullRequestReviewComment } from "@makers-devops/github";
-import { FRONTEND_BOT_CHANNEL } from "../constant";
+import { CHANNELS } from "../constant";
 import { PR_리뷰, PR_열림 } from "@makers-devops/slack-blocks";
 import type { PR열림Options } from "@makers-devops/slack-blocks";
 
@@ -10,7 +10,7 @@ export const createPullRequestThread = async (pull: PullRequest, options: PR열�
   const key = getPullRequestThreadKey(pull);
 
   const result = await createSlackThread(key, {
-    channel: FRONTEND_BOT_CHANNEL,
+    channel: CHANNELS.FRONTEND_BOT,
     message: PR_열림.slackPayload(pull, options),
     ex: 60 * 60 * 24 * 21,
   });
