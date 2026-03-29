@@ -1,19 +1,14 @@
 import { Router, type Request, type Response } from "express";
-import { createSlackNotifier } from "./slack";
-import { assertNonNullish } from "./utils/assert";
-import { pullRequestSchema, pullRequestReviewCommentSchema } from "./github/schema";
-import { FRONTEND_BOT_CHANNEL } from "./constant";
-import { handlePullRequest } from "./github/pull_request";
-import { handlePullRequestReviewComment } from "./github/comment";
+import { assertNonNullish } from "@makers-devops/shared";
+import { pullRequestSchema, pullRequestReviewCommentSchema } from "@makers-devops/github";
+import { handlePullRequest } from "./handler/pull_request";
+import { handlePullRequestReviewComment } from "./handler/pull_request-review-comment";
 import { isValidRepository } from "./config";
 
 export function createWebhookRouter(): Router {
   assertNonNullish(process.env.SLACK_BOT_TOKEN, "SLACK_BOT_TOKEN 환경변수가 누락되었어요.");
-  const slackNotifier = createSlackNotifier(process.env.SLACK_BOT_TOKEN);
 
   const router = Router();
-
-  slackNotifier.init({ channel: FRONTEND_BOT_CHANNEL });
 
   router.post("/webhook", async (req: Request, res: Response) => {
     const event = req.headers["x-github-event"];
@@ -34,11 +29,11 @@ export function createWebhookRouter(): Router {
     try {
       switch (event) {
         case "pull_request": {
-          handlePullRequest(pullRequestSchema.parse(req.body), slackNotifier).then((res) => console.log(res));
+          handlePullRequest(pullRequestSchema.parse(req.body)).then((res) => console.log(res));
           break;
         }
         case "pull_request_review_comment": {
-          handlePullRequestReviewComment(pullRequestReviewCommentSchema.parse(req.body), slackNotifier).then((res) =>
+          handlePullRequestReviewComment(pullRequestReviewCommentSchema.parse(req.body)).then((res) =>
             console.log(res),
           );
           break;

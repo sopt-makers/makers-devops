@@ -9,14 +9,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@octokit/rest": "^21.0.0",
-    "@octokit/webhooks": "^13.0.0",
+    "@makers-devops/redis": "workspace:*",
+    "@makers-devops/slack": "workspace:*",
+    "@makers-devops/shared": "workspace:*",
+    "@makers-devops/github": "workspace:*",
+    "@makers-devops/slack-blocks": "workspace:*",
     "@slack/web-api": "^7.0.0",
     "dotenv": "^16.4.0",
     "express": "^4.21.0",
     "tsx": "^4.19.0",
-    "zod": "^4.3.6",
-    "@makers-devops/redis": "workspace:*"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/express": "^5.0.0"
