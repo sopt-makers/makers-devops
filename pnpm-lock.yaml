@@ -14,6 +14,9 @@ importers:
       '@types/node':
         specifier: ^25.3.2
         version: 25.3.2
+      dotenv:
+        specifier: ^16.4.0
+        version: 16.6.1
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -24,23 +27,67 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  packages/github:
+    dependencies:
+      '@octokit/rest':
+        specifier: ^21.0.0
+        version: 21.1.1
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+
   packages/redis:
     dependencies:
+      '@makers-devops/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@upstash/redis':
         specifier: ^1.36.3
         version: 1.36.3
 
-  servers/mumu:
+  packages/shared: {}
+
+  packages/slack:
     dependencies:
       '@makers-devops/redis':
         specifier: workspace:*
+        version: link:../redis
+      '@slack/types':
+        specifier: ^2.19.0
+        version: 2.20.0
+      '@slack/web-api':
+        specifier: ^7.0.0
+        version: 7.14.1
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+
+  packages/slack-blocks:
+    dependencies:
+      '@makers-devops/github':
+        specifier: workspace:*
+        version: link:../github
+      '@slack/types':
+        specifier: ^2.19.0
+        version: 2.20.0
+
+  servers/mumu:
+    dependencies:
+      '@makers-devops/github':
+        specifier: workspace:*
+        version: link:../../packages/github
+      '@makers-devops/redis':
+        specifier: workspace:*
         version: link:../../packages/redis
-      '@octokit/rest':
-        specifier: ^21.0.0
-        version: 21.1.1
-      '@octokit/webhooks':
-        specifier: ^13.0.0
-        version: 13.9.1
+      '@makers-devops/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      '@makers-devops/slack':
+        specifier: workspace:*
+        version: link:../../packages/slack
+      '@makers-devops/slack-blocks':
+        specifier: workspace:*
+        version: link:../../packages/slack-blocks
       '@slack/web-api':
         specifier: ^7.0.0
         version: 7.14.1
@@ -294,9 +341,6 @@ packages:
   '@octokit/openapi-types@25.1.0':
     resolution: {integrity: sha512-idsIggNXUKkk0+BExUn1dQ92sfysJrje03Q0bv0e+KPLrvyqZF8MnBpFz8UNfYDwB3Ie7Z0TByjWfzxt7vseaA==}
 
-  '@octokit/openapi-webhooks-types@11.0.0':
-    resolution: {integrity: sha512-ZBzCFj98v3SuRM7oBas6BHZMJRadlnDoeFfvm1olVxZnYeU6Vh97FhPxyS5aLh5pN51GYv2I51l/hVUAVkGBlA==}
-
   '@octokit/plugin-paginate-rest@11.6.0':
     resolution: {integrity: sha512-n5KPteiF7pWKgBIBJSk8qzoZWcUkza2O6A0za97pMGVrGfPdltxrfmfF5GucHYvHGZD8BdaZmmHGz5cX/3gdpw==}
     engines: {node: '>= 18'}
@@ -332,14 +376,6 @@ packages:
 
   '@octokit/types@14.1.0':
     resolution: {integrity: sha512-1y6DgTy8Jomcpu33N+p5w58l6xyt55Ar2I91RPiIA0xCJBXyUAhXCcmZaDWSANiha7R9a6qJJ2CRomGPZ6f46g==}
-
-  '@octokit/webhooks-methods@5.1.1':
-    resolution: {integrity: sha512-NGlEHZDseJTCj8TMMFehzwa9g7On4KJMPVHDSrHxCQumL6uSQR8wIkP/qesv52fXqV1BPf4pTxwtS31ldAt9Xg==}
-    engines: {node: '>= 18'}
-
-  '@octokit/webhooks@13.9.1':
-    resolution: {integrity: sha512-Nss2b4Jyn4wB3EAqAPJypGuCJFalz/ZujKBQQ5934To7Xw9xjf4hkr/EAByxQY7hp7MKd790bWGz7XYSTsHmaw==}
-    engines: {node: '>= 18'}
 
   '@slack/logger@4.0.0':
     resolution: {integrity: sha512-Wz7QYfPAlG/DR+DfABddUZeNgoeY7d1J39OCR2jR+v7VBsB8ezulDK5szTnDDPDwLH5IWhLvXIHlCFZV7MSKgA==}
@@ -1054,8 +1090,6 @@ snapshots:
 
   '@octokit/openapi-types@25.1.0': {}
 
-  '@octokit/openapi-webhooks-types@11.0.0': {}
-
   '@octokit/plugin-paginate-rest@11.6.0(@octokit/core@6.1.6)':
     dependencies:
       '@octokit/core': 6.1.6
@@ -1096,14 +1130,6 @@ snapshots:
   '@octokit/types@14.1.0':
     dependencies:
       '@octokit/openapi-types': 25.1.0
-
-  '@octokit/webhooks-methods@5.1.1': {}
-
-  '@octokit/webhooks@13.9.1':
-    dependencies:
-      '@octokit/openapi-webhooks-types': 11.0.0
-      '@octokit/request-error': 6.1.8
-      '@octokit/webhooks-methods': 5.1.1
 
   '@slack/logger@4.0.0':
     dependencies:
