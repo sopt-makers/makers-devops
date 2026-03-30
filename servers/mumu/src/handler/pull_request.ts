@@ -4,6 +4,8 @@ import { getPullRequestThreadKey } from "../slack/key";
 import { deleteSlackThreadData, findSlackThread, slackClient } from "@makers-devops/slack";
 import { PR_닫힘 } from "@makers-devops/slack-blocks";
 import { assignReviewersAndAssignee } from "../github";
+import { selectReviewers } from "../github/review";
+import { config } from "../config";
 
 type HandledAction = (typeof HANDLED_ACTIONS)[number];
 const HANDLED_ACTIONS = ["opened", "reopened", "closed"] as const;
@@ -41,15 +43,27 @@ export const handlePullRequest = async (pullRequest: PullRequest) => {
     return JSON.stringify({ success: false, message: "Pull request action skipped." });
   }
 
-  /** PR이 closed/merged 된 경우 */
   if (pullRequest.action === "closed") {
     return await handlePullRequestClosed(pullRequest);
   }
 
-  /** 백그라운드에서 리뷰어/작성자 지정 (not await) */
-  assignReviewersAndAssignee(pullRequest);
+  const authorLogin = pullRequest.pull_request.user.login;
+  const author = config.admins.find((admin) => admin.github === authorLogin);
 
-  const result = await createPullRequestThread(pullRequest);
+  if (!author) {
+    return JSON.stringify({ success: false, message: "Author is not admin user" });
+  }
+
+  const reviewers = selectReviewers(config.admins, authorLogin, 3);
+  const reviewerGithubIds = reviewers.map((r) => r.github);
+  const reviewerSlackIds = reviewers.map((r) => r.slack);
+
+  assignReviewersAndAssignee(pullRequest, reviewerGithubIds);
+
+  const result = await createPullRequestThread(pullRequest, {
+    authorId: author.slack,
+    reviewerIds: reviewerSlackIds,
+  });
 
   if (!result) {
     return JSON.stringify({ success: false, message: "Slack thread creation failed" });

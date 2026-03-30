@@ -3,8 +3,8 @@ import type { KnownBlock } from "@slack/types";
 import type { SlackBlockPayload } from "../types";
 
 export type PR열림Options = {
-  authorMention: string;
-  reviewerMentions: string;
+  authorId: string;
+  reviewerIds: string[];
 };
 
 export const blocks = (pull: PullRequest, options: PR열림Options): KnownBlock[] => {
@@ -12,7 +12,8 @@ export const blocks = (pull: PullRequest, options: PR열림Options): KnownBlock[
   const repoFullName = repository.full_name;
   const { html_url: prUrl, number: prNumber, title } = pull_request;
 
-  const { authorMention, reviewerMentions } = options;
+  const authorMention = `<@${options.authorId}>`;
+  const reviewerMentions = options.reviewerIds.map((id) => `<@${id}>`).join(", ");
 
   return [
     {

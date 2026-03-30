@@ -3,25 +3,15 @@ import { getPullRequestThreadKey } from "./key";
 import type { PullRequest, PullRequestReviewComment } from "@makers-devops/github";
 import { FRONTEND_BOT_CHANNEL } from "../constant";
 import { PR_리뷰, PR_열림 } from "@makers-devops/slack-blocks";
-import { config } from "../config";
-import { getReviewers } from "../global/reviewer";
+import type { PR열림Options } from "@makers-devops/slack-blocks";
 
 /** PR에 대한 스레드를 생성합니다. */
-export const createPullRequestThread = async (pull: PullRequest) => {
+export const createPullRequestThread = async (pull: PullRequest, options: PR열림Options) => {
   const key = getPullRequestThreadKey(pull);
-
-  const authorLogin = pull.pull_request.user.login;
-  const author = config.admins.find((admin) => admin.github === authorLogin);
-  const authorMention = author ? `<@${author.slack}>` : authorLogin;
 
   const result = await createSlackThread(key, {
     channel: FRONTEND_BOT_CHANNEL,
-    message: PR_열림.slackPayload(pull, {
-      authorMention,
-      reviewerMentions: getReviewers()
-        .map((reviewer) => `<@${reviewer.slack}>`)
-        .join(", "),
-    }),
+    message: PR_열림.slackPayload(pull, options),
     ex: 60 * 60 * 24 * 21,
   });
 
