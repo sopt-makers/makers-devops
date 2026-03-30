@@ -2,7 +2,6 @@ import type { Request, Response } from "express";
 import { isValidRepository } from "../../config";
 import { handlePullRequestReviewComment } from "./pull_request-review-comment";
 import { handlePullRequest } from "./pull_request";
-import { pullRequestReviewCommentSchema, pullRequestSchema } from "@makers-devops/github";
 
 export const handleGithubWebhook = async (req: Request, res: Response) => {
   const event = req.headers["x-github-event"];
@@ -23,15 +22,16 @@ export const handleGithubWebhook = async (req: Request, res: Response) => {
   try {
     switch (event) {
       case "pull_request": {
-        handlePullRequest(pullRequestSchema.parse(req.body)).then((res) => console.log(res));
+        await handlePullRequest(req, res);
         break;
       }
       case "pull_request_review_comment": {
-        handlePullRequestReviewComment(pullRequestReviewCommentSchema.parse(req.body)).then((res) => console.log(res));
+        await handlePullRequestReviewComment(req, res);
         break;
       }
     }
   } catch (err) {
     console.error(`[${event}] webhook 처리 실패:`, err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };

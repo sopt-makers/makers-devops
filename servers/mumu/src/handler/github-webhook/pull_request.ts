@@ -1,4 +1,5 @@
-import type { PullRequest } from "@makers-devops/github";
+import type { Request, Response } from "express";
+import { pullRequestSchema, type PullRequest } from "@makers-devops/github";
 import { createPullRequestThread } from "../../slack";
 import { getPullRequestThreadKey } from "../../slack/key";
 import { deleteSlackThreadData, findSlackThread, slackClient } from "@makers-devops/slack";
@@ -10,13 +11,13 @@ import { config } from "../../config";
 type HandledAction = (typeof HANDLED_ACTIONS)[number];
 const HANDLED_ACTIONS = ["opened", "reopened", "closed"] as const;
 
-const handlePullRequestClosed = async (pullRequest: PullRequest) => {
+const handlePullRequestClosed = async (_req: Request, res: Response, pullRequest: PullRequest) => {
   const key = getPullRequestThreadKey(pullRequest);
 
   const thread = await findSlackThread(key);
 
   if (!thread) {
-    return JSON.stringify({ success: false, message: "Slack thread not found" });
+    return res.json({ success: false, message: "Slack thread not found" });
   }
 
   try {
@@ -27,7 +28,7 @@ const handlePullRequestClosed = async (pullRequest: PullRequest) => {
     });
 
     if (!response.ok) {
-      return JSON.stringify({ success: false, message: "Slack thread reply failed" });
+      return res.json({ success: false, message: "Slack thread reply failed" });
     }
   } catch {
     console.error(`${key}: Pull request closed failed`);
@@ -35,23 +36,25 @@ const handlePullRequestClosed = async (pullRequest: PullRequest) => {
 
   await deleteSlackThreadData(key);
 
-  return JSON.stringify({ success: true, message: "Pull request closed." });
+  return res.json({ success: true, message: "Pull request closed." });
 };
 
-export const handlePullRequest = async (pullRequest: PullRequest) => {
+export const handlePullRequest = async (req: Request, res: Response) => {
+  const pullRequest = pullRequestSchema.parse(req.body);
+
   if (!HANDLED_ACTIONS.includes(pullRequest.action as HandledAction)) {
-    return JSON.stringify({ success: false, message: "Pull request action skipped." });
+    return res.json({ success: false, message: "Pull request action skipped." });
   }
 
   if (pullRequest.action === "closed") {
-    return await handlePullRequestClosed(pullRequest);
+    return await handlePullRequestClosed(req, res, pullRequest);
   }
 
   const authorLogin = pullRequest.pull_request.user.login;
   const author = config.admins.find((admin) => admin.github === authorLogin);
 
   if (!author) {
-    return JSON.stringify({ success: false, message: "Author is not admin user" });
+    return res.json({ success: false, message: "Author is not admin user" });
   }
 
   const reviewers = selectReviewers(config.admins, authorLogin, 3);
@@ -66,8 +69,8 @@ export const handlePullRequest = async (pullRequest: PullRequest) => {
   });
 
   if (!result) {
-    return JSON.stringify({ success: false, message: "Slack thread creation failed" });
+    return res.json({ success: false, message: "Slack thread creation failed" });
   }
 
-  return JSON.stringify({ success: true, message: "Pull request processed successfully", result });
+  return res.json({ success: true, message: "Pull request processed successfully", result });
 };
