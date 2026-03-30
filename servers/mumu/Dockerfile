@@ -7,7 +7,7 @@ FROM base AS deps
 WORKDIR /app
 
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
-COPY packages/redis/package.json ./packages/redis/
+COPY packages/ ./packages/
 COPY servers/mumu/package.json ./servers/mumu/
 
 RUN pnpm install --frozen-lockfile
@@ -18,7 +18,7 @@ ENV NODE_ENV=production
 
 COPY --from=deps /app ./
 
-COPY packages/redis ./packages/redis
+COPY packages/ ./packages/
 COPY servers/mumu ./servers/mumu
 
 EXPOSE 3000
