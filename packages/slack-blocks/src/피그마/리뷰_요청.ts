@@ -9,7 +9,7 @@ export const blocks = (payload: DesignReviewRequestBody): KnownBlock[] => {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*${userName}*님의 [디자인 리뷰 요청]`,
+        text: `*${userName}* 님의 [디자인 리뷰 요청]`,
       },
     },
     {
