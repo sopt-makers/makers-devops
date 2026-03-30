@@ -25,20 +25,14 @@ export const blocks = (pull: PullRequest, options: PR열림Options): KnownBlock[
     },
     {
       type: "section",
-      fields: [
-        {
-          type: "mrkdwn",
-          text: `*PR:* <${prUrl}|#${prNumber} ${title}>`,
-        },
-        {
-          type: "mrkdwn",
-          text: `*작성자:* ${authorMention}`,
-        },
-        {
-          type: "mrkdwn",
-          text: `*리뷰어:* ${reviewerMentions}`,
-        },
-      ],
+      text: {
+        type: "mrkdwn",
+        text: [
+          `> *PR:* <${prUrl}|#${prNumber} ${title}>`,
+          `> *작성자:* ${authorMention}`,
+          `> *리뷰어:* ${reviewerMentions}`,
+        ].join("\n"),
+      },
     },
   ];
 };

@@ -14,24 +14,15 @@ export const blocks = (payload: DesignReviewRequestBody): KnownBlock[] => {
     },
     {
       type: "section",
-      fields: [
-        {
-          type: "mrkdwn",
-          text: `*작업:* ${task}`,
-        },
-        {
-          type: "mrkdwn",
-          text: `*리뷰 요청 일정:* ~${schedule}`,
-        },
-        {
-          type: "mrkdwn",
-          text: `*Figma:* <${fileUrl}|${fileUrl}>`,
-        },
-        {
-          type: "mrkdwn",
-          text: `*리뷰 요청 포인트:* ${reviewPoints}`,
-        },
-      ],
+      text: {
+        type: "mrkdwn",
+        text: [
+          `> *작업:* ${task}`,
+          `> *리뷰 요청 일정:* ~${schedule}`,
+          `> *Figma:* <${fileUrl}|${fileUrl}>`,
+          `> *리뷰 요청 포인트:* ${reviewPoints}`,
+        ].join("\n"),
+      },
     },
   ];
 };
