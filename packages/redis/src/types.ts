@@ -5,9 +5,3 @@ export type RedisClient = {
   set: <T = string>(key: string, value: T, options?: SetCommandOptions) => Promise<T | "OK" | null>;
   delete: (key: string) => Promise<number>;
 };
-
-export type RedisConfig = {
-  url: string;
-  token: string;
-  retry?: number;
-};
