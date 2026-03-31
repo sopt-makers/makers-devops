@@ -51,13 +51,13 @@ export const handlePullRequest = async (req: Request, res: Response) => {
   }
 
   const authorLogin = pullRequest.pull_request.user.login;
-  const author = config.admins.find((admin) => admin.github === authorLogin);
+  const author = config.frontend.admins.find((admin) => admin.github === authorLogin);
 
   if (!author) {
     return res.json({ success: false, message: "Author is not admin user" });
   }
 
-  const reviewers = selectReviewers(config.admins, authorLogin, 3);
+  const reviewers = selectReviewers(config.frontend.admins, authorLogin, 3);
   const reviewerGithubIds = reviewers.map((r) => r.github);
   const reviewerSlackIds = reviewers.map((r) => r.slack);
 
