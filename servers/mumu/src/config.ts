@@ -21,5 +21,5 @@ export const config = loadConfig();
 export function isValidRepository(repo: string | null | undefined) {
   if (repo == null) return false;
 
-  return config.repos.includes(repo);
+  return config.frontend.repos.includes(repo);
 }

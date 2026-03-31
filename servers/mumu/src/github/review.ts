@@ -1,6 +1,6 @@
 import { githubClient } from "@makers-devops/github";
 import { MAKERS_OWNER } from "../constant";
-import type { AdminUser } from "../types";
+import type { Developer } from "../types";
 
 export async function assignReviewers(repo: string, prNumber: number, reviewers: string[]) {
   const response = await githubClient.pulls.requestReviewers({
@@ -13,7 +13,7 @@ export async function assignReviewers(repo: string, prNumber: number, reviewers:
   return response;
 }
 
-export function selectReviewers(admins: AdminUser[], excludeUser: string, count = 3): AdminUser[] {
+export function selectReviewers(admins: Developer[], excludeUser: string, count = 3): Developer[] {
   const candidates = admins.filter((admin) => admin.github !== excludeUser);
 
   // Fisher-Yates shuffle
