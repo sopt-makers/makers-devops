@@ -36,6 +36,8 @@
     "sopt-crew-frontend",
     "sopt-operation-frontend",
     "sopt-recruiting-frontend",
-    "makers-design-system-2.0"
+    "sopt.org-frontend",
+    "makers-design-system-2.0",
+    "sopt-auth-frontend"
   ]
 }
