@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cors from "cors";
 import { createWebhookRouter } from "./webhook";
 import { assertNonNullish } from "@makers-devops/shared";
 
@@ -19,6 +20,15 @@ const necessaryEnvVars = [
 for (const envVar of necessaryEnvVars) {
   assertNonNullish(process.env[envVar], `${envVar} is not set`);
 }
+
+/** Figma 플러그인 요청 허용 */
+app.use(
+  cors({
+    origin: "null",
+    methods: ["POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+  }),
+);
 
 /** 요청 JSON 바디 파싱 */
 app.use(express.json());
