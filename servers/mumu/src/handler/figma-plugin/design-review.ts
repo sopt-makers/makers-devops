@@ -14,7 +14,7 @@ export const handleDesignReview = async (req: Request, res: Response) => {
   try {
     await slackClient.chat.postMessage({
       /** TODO(@wuzoo): 테스트 후 채널 변경 */
-      channel: CHANNELS.TEST,
+      channel: CHANNELS.DESIGN_REVIEW,
       ...피그마_리뷰_요청.slackPayload(result.data),
     });
   } catch {
