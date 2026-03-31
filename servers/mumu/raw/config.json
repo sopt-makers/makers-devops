@@ -1,41 +1,86 @@
 {
-  "admins": [
-    {
-      "github": "wuzoo",
-      "slack": "U07HP891PQW"
-    },
-    {
-      "github": "namdaeun",
-      "slack": "U08EL9ABEPK"
-    },
-    {
-      "github": "constantly-dev",
-      "slack": "U09CF6MG3SS"
-    },
-    {
-      "github": "jeonghoon11",
-      "slack": "U0AHNG8ST2M"
-    },
-    {
-      "github": "sonnnnhe",
-      "slack": "U0AH66C3LAZ"
-    },
-    {
-      "github": "jogpfls",
-      "slack": "U0AH3773LG3"
-    },
-    {
-      "github": "ExceptAnyone",
-      "slack": "U0AGU5C6E87"
-    }
-  ],
-  "repos": [
-    "makers-devops",
-    "sopt-makers-frontend",
-    "sopt-operation-frontend",
-    "sopt-recruiting-frontend",
-    "sopt.org-frontend",
-    "makers-design-system-2.0",
-    "sopt-auth-frontend"
-  ]
+  "frontend": {
+    "admins": [
+      {
+        "name": "최주용",
+        "github": "wuzoo",
+        "slack": "U07HP891PQW"
+      },
+      {
+        "name": "남다은",
+        "github": "namdaeun",
+        "slack": "U08EL9ABEPK"
+      },
+      {
+        "name": "이진혁",
+        "github": "constantly-dev",
+        "slack": "U09CF6MG3SS"
+      },
+      {
+        "name": "장정훈",
+        "github": "jeonghoon11",
+        "slack": "U0AHNG8ST2M"
+      },
+      {
+        "name": "손하은",
+        "github": "sonnnnhe",
+        "slack": "U0AH66C3LAZ"
+      },
+      {
+        "name": "조혜린",
+        "github": "jogpfls",
+        "slack": "U0AH3773LG3"
+      },
+      {
+        "name": "장정안",
+        "github": "ExceptAnyone",
+        "slack": "U0AGU5C6E87"
+      }
+    ],
+    "repos": [
+      "makers-devops",
+      "sopt-makers-frontend",
+      "sopt-operation-frontend",
+      "sopt-recruiting-frontend",
+      "sopt.org-frontend",
+      "makers-design-system-2.0",
+      "sopt-auth-frontend"
+    ]
+  },
+  "design": {
+    "admins": [
+      {
+        "name": "이유지",
+        "slack": "U08EL9AT56D"
+      },
+      {
+        "name": "장린",
+        "slack": "U09CF6WUZ2S"
+      },
+      {
+        "name": "손은서",
+        "slack": "U04QEPWDVA9"
+      },
+      {
+        "name": "전희주",
+        "slack": "U09CF6XAXFG"
+      },
+      {
+        "name": "김희재",
+        "slack": "U0AHD77TV1S"
+      },
+      {
+        "name": "하수정",
+        "slack": "U0AH7GSE7UN"
+      },
+      {
+        "name": "이미영",
+        "slack": "U0AH374DY8K"
+      },
+      {
+        "name": "이재영",
+        "slack": "U08E51Z5NR3"
+      }
+    ]
+  }
 }

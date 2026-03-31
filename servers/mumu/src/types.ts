@@ -1,14 +1,22 @@
-export type AdminUser = {
-  github: string;
+export type Member = {
+  name: string;
   slack: string;
 };
 
-export type RepositoryConfig = {
-  repo: string;
-  admins: AdminUser[];
+export type Developer = Member & {
+  github: string;
+};
+
+export type FrontendConfig = {
+  admins: Developer[];
+  repos: string[];
+};
+
+export type DesignConfig = {
+  admins: Member[];
 };
 
 export type Config = {
-  admins: AdminUser[];
-  repos: string[];
+  frontend: FrontendConfig;
+  design: DesignConfig;
 };
