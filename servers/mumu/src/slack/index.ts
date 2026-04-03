@@ -1,4 +1,5 @@
-import { createSlackThread, findSlackThread, slackClient } from "@makers-devops/slack";
+import { slackClient } from "@makers-devops/slack/client";
+import { createSlackThread, findSlackThread } from "@makers-devops/slack/thread";
 import { getPullRequestThreadKey } from "./key";
 import type { PullRequest, PullRequestReviewComment } from "@makers-devops/github";
 import { CHANNELS } from "../constant";
