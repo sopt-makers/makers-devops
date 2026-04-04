@@ -1,25 +1,24 @@
-import path from "path";
-import { fileURLToPath } from "url";
-import fsp from "fs/promises";
+import { redisClient } from "@makers-devops/redis";
 
-const dirname = path.dirname(fileURLToPath(import.meta.url));
-const STORE_PATH = path.relative(dirname, "./store.json");
+const REDIS_KEY = "geek-news-state";
 
 interface NewsState {
   lastPublishedAt: string;
   recentIds: string[];
 }
 
-export const loadStates = async () => {
+const DEFAULT_STATE: NewsState = {
+  lastPublishedAt: "",
+  recentIds: [],
+};
+
+export const loadStates = async (): Promise<NewsState> => {
   try {
-    const raw = await fsp.readFile(STORE_PATH, "utf-8");
-    return JSON.parse(raw) as NewsState;
+    const state = await redisClient.get<NewsState>(REDIS_KEY);
+    return state ?? DEFAULT_STATE;
   } catch (error) {
-    console.error(error);
-    return {
-      lastPublishedAt: "",
-      recentIds: [],
-    };
+    console.error("[store] Redis 조회 실패:", error);
+    return DEFAULT_STATE;
   }
 };
 
@@ -29,5 +28,5 @@ export const saveStates = async (lastPublishedAt: string, ids: string[]) => {
     recentIds: ids,
   };
 
-  await fsp.writeFile(STORE_PATH, JSON.stringify(state, null, 2));
+  await redisClient.set(REDIS_KEY, state);
 };

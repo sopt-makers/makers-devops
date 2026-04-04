@@ -21,5 +21,4 @@ COPY --from=deps /app ./
 COPY packages/ ./packages/
 COPY servers/geek-news-bot ./servers/geek-news-bot
 
-EXPOSE 8000
 CMD ["pnpm", "-F=@makers-devops/geek-news-bot", "start"]
