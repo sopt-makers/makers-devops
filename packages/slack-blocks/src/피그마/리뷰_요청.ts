@@ -25,7 +25,7 @@ export const blocks = (payload: DesignReviewRequestBody, options: 리뷰요청Op
         text: [
           `> *작업:* ${task}`,
           `> *리뷰 요청 일정:* ~${schedule}`,
-          `> *Figma:* <${fileUrl}|${fileUrl}>`,
+          `> *Figma:* <${fileUrl}|링크 바로가기>`,
           `> *리뷰 요청 포인트:* ${reviewPoints}`,
         ].join("\n"),
       },
