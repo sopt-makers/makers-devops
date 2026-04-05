@@ -4,6 +4,11 @@ import { sendSlackNotification } from "./slack";
 import { loadStates, saveStates } from "./store";
 import { ENV } from "./env";
 
+const toTimestamp = (dateStr: string): number => {
+  const ms = new Date(dateStr).getTime();
+  return Number.isNaN(ms) ? 0 : ms;
+};
+
 export const runNewsJob = async () => {
   console.log(`[${new Date().toISOString()}] 긱뉴스 패치 시작`);
 
@@ -15,10 +20,15 @@ export const runNewsJob = async () => {
 
   const newItems = allNews
     .filter((item) => {
-      /** 타임스탬프 기반 필터링 */
-      if (state.lastPublishedAt && item.pubDate <= state.lastPublishedAt) {
-        /** 동일 시각 발행 뉴스는 ID로 중복 체크 */
-        if (item.pubDate === state.lastPublishedAt) {
+      const itemTs = toTimestamp(item.pubDate);
+
+      /**
+       * 타임스탬프 기반 중복 필터링
+       * - lastPublishedAt보다 오래된 뉴스는 이미 처리된 것으로 간주
+       * - lastPublishedAt와 동일한 타임스탬프에 발행된 뉴스는 recentIds로 중복 체크
+       */
+      if (state.lastPublishedAt && itemTs <= state.lastPublishedAt) {
+        if (itemTs === state.lastPublishedAt) {
           return !recentIdSet.has(item.id);
         }
         return false;
@@ -32,17 +42,18 @@ export const runNewsJob = async () => {
     return;
   }
 
-  /** AI 필터링 */
   const frontendNews = await filterFrontendNews(newItems);
 
-  await sendSlackNotification(frontendNews);
-
+  /** 다음 실행의 중복 방지를 위해 처리된 뉴스 ID를 누적 */
   const allProcessedIds = [...state.recentIds, ...newItems.map((item) => item.id)];
-  const latestPubDate = newItems.reduce(
-    (latest, item) => (item.pubDate > latest ? item.pubDate : latest),
+  /** 최신 발생 시간 타임스탬프 기준 최신화 */
+  const latestTimestamp = newItems.reduce(
+    (latest, item) => Math.max(latest, toTimestamp(item.pubDate)),
     state.lastPublishedAt,
   );
-  await saveStates(latestPubDate, allProcessedIds);
 
+  await saveStates(latestTimestamp, allProcessedIds);
+
+  await sendSlackNotification(frontendNews);
   console.log(`[${new Date().toISOString()}] 작업 완료`);
 };

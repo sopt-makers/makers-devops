@@ -85,6 +85,9 @@ importers:
       '@ai-sdk/google':
         specifier: ^3.0.57
         version: 3.0.57(zod@3.25.76)
+      '@makers-devops/redis':
+        specifier: workspace:*
+        version: link:../../packages/redis
       '@makers-devops/shared':
         specifier: workspace:*
         version: link:../../packages/shared
