@@ -6,7 +6,7 @@ process.on("unhandledRejection", (err) => {
   console.error("Unhandled rejection:", err);
 });
 
-/** 최초 fetch */
+/** 최초 fetch, 서버 시작 시만 유효 */
 runNewsJob().catch((err) => {
   console.error("Initial run failed:", err);
 });
