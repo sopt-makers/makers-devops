@@ -26,7 +26,7 @@ export const blocks = (payload: DesignReviewRequestBody, options: 리뷰요청Op
           `> *작업:* ${task}`,
           `> *리뷰 요청 일정:* ~${schedule}`,
           `> *Figma:* <${fileUrl}|링크 바로가기>`,
-          `> *리뷰 요청 포인트:* ${reviewPoints}`,
+          `> *리뷰 요청 포인트:* ${reviewPoints.replace(/\n/g, "\n> ")}`,
         ].join("\n"),
       },
     },
