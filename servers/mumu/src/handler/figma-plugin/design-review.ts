@@ -1,5 +1,5 @@
 import { designReviewRequestBodySchema } from "@makers-devops/figma";
-import { slackClient } from "@makers-devops/slack";
+import { slackClient } from "@makers-devops/slack/client";
 import type { Request, Response } from "express";
 import { CHANNELS } from "../../constant";
 import { 피그마_리뷰_요청 } from "@makers-devops/slack-blocks";

@@ -1,0 +1,33 @@
+{
+  "name": "@makers-devops/geek-news-bot",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx --watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^3.0.57",
+    "@makers-devops/redis": "workspace:*",
+    "@makers-devops/shared": "workspace:*",
+    "@makers-devops/slack": "workspace:*",
+    "ai": "^6.0.145",
+    "dedent": "^1.7.2",
+    "dotenv": "^16.4.0",
+    "node-cron": "^3.0.3",
+    "rss-parser": "^3.13.0",
+    "tsx": "^4.19.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@slack/types": "^2.19.0",
+    "@types/node-cron": "^3.0.11",
+    "vitest": "^4.1.2"
+  },
+  "packageManager": "pnpm@10.22.0"
+}

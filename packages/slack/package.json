@@ -7,7 +7,9 @@
     "typecheck": "tsc --noEmit"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./thread": "./src/thread.ts"
   },
   "dependencies": {
     "@makers-devops/redis": "workspace:*",
