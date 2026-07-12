@@ -6,15 +6,18 @@
   "scripts": {
     "dev": "tsx --watch src/index.ts",
     "start": "tsx src/index.ts",
+    "test:ux": "tsx src/scripts/test-ux-review.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@google/genai": "^2.10.0",
     "@makers-devops/figma": "workspace:*",
     "@makers-devops/github": "workspace:*",
     "@makers-devops/redis": "workspace:*",
     "@makers-devops/shared": "workspace:*",
     "@makers-devops/slack": "workspace:*",
     "@makers-devops/slack-blocks": "workspace:*",
+    "@slack/bolt": "^4.7.3",
     "@slack/web-api": "^7.0.0",
     "cors": "^2.8.6",
     "dotenv": "^16.4.0",

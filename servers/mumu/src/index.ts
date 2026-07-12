@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { createWebhookRouter } from "./webhook";
 import { assertNonNullish } from "@makers-devops/shared";
+import { startSlackBot } from "./slack/bot";
 
 process.on("unhandledRejection", (reason) => {
   console.error("Unhandled rejection:", reason);
@@ -14,7 +15,9 @@ const necessaryEnvVars = [
   "UPSTASH_REDIS_REST_URL",
   "UPSTASH_REDIS_REST_TOKEN",
   "SLACK_BOT_TOKEN",
+  "SLACK_APP_TOKEN",
   "GITHUB_TOKEN",
+  "GEMINI_API_KEY",
 ] as const;
 
 for (const envVar of necessaryEnvVars) {
@@ -43,4 +46,8 @@ const port = Number(process.env.PORT) || 3000;
 
 app.listen(port, () => {
   console.log(`mumu server running on port:${port}`);
+});
+
+startSlackBot().catch((error) => {
+  console.error("Slack bot start failed:", error);
 });
