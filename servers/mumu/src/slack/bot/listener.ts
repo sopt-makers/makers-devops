@@ -4,12 +4,38 @@ import { formatUxReviewForSlack, reviewUxWriting } from "../../ai";
 /** 멘션 텍스트에서 봇 멘션(<@U123>)을 제거한다. */
 const stripMention = (text: string): string => text.replace(/<@[A-Z0-9]+>/g, "").trim();
 
+const LOADING_REACTION = "loading";
+const DONE_REACTION = "white_check_mark";
+
+type SlackReactionClient = {
+  reactions: {
+    add: (args: { channel: string; timestamp: string; name: string }) => Promise<unknown>;
+    remove: (args: { channel: string; timestamp: string; name: string }) => Promise<unknown>;
+  };
+};
+
 const HELP_MESSAGE = [
   "*mumu UX Writing 리뷰 봇*",
   "",
   "검토하고 싶은 문구나 맥락을 멘션과 함께 보내주세요.",
   '예) `@mumu 결제 실패 화면에 "오류가 발생했습니다" 라고 띄우려는데 괜찮을까?`',
 ].join("\n");
+
+const addReaction = async (client: SlackReactionClient, channel: string, timestamp: string, name: string) => {
+  try {
+    await client.reactions.add({ channel, timestamp, name });
+  } catch (error) {
+    console.error(`reaction add failed (${name}):`, error);
+  }
+};
+
+const removeReaction = async (client: SlackReactionClient, channel: string, timestamp: string, name: string) => {
+  try {
+    await client.reactions.remove({ channel, timestamp, name });
+  } catch (error) {
+    console.error(`reaction remove failed (${name}):`, error);
+  }
+};
 
 export const registerSlackBotListeners = (app: App): void => {
   app.event("app_mention", async ({ event, client, logger }) => {
@@ -18,6 +44,7 @@ export const registerSlackBotListeners = (app: App): void => {
     }
 
     const channel = event.channel;
+    const messageTs = event.ts;
     const threadTs = event.thread_ts ?? event.ts;
     const query = stripMention(event.text);
 
@@ -26,12 +53,7 @@ export const registerSlackBotListeners = (app: App): void => {
       return;
     }
 
-    /** 처리 시간이 길 수 있어 우선 접수 메시지를 전송 */
-    await client.chat.postMessage({
-      channel,
-      thread_ts: threadTs,
-      text: "요청을 확인하고 UX Writing 기준으로 검토 중이에요. 잠시만 기다려주세요. ✍️",
-    });
+    await addReaction(client, channel, messageTs, LOADING_REACTION);
 
     try {
       const result = await reviewUxWriting(query);
@@ -41,8 +63,13 @@ export const registerSlackBotListeners = (app: App): void => {
         thread_ts: threadTs,
         text: formatUxReviewForSlack(result),
       });
+
+      await removeReaction(client, channel, messageTs, LOADING_REACTION);
+      await addReaction(client, channel, messageTs, DONE_REACTION);
     } catch (error) {
       logger.error(error);
+
+      await removeReaction(client, channel, messageTs, LOADING_REACTION);
 
       await client.chat.postMessage({
         channel,
