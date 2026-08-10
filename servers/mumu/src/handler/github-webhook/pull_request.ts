@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
-import { pullRequestSchema, type PullRequest } from "@makers-devops/github";
-import { createPullRequestThread } from "../../slack";
+import { pullRequestReviewRequestedSchema, pullRequestSchema, type PullRequest } from "@makers-devops/github";
+import { createPullRequestReRequestedReply, createPullRequestThread } from "../../slack";
 import { getPullRequestThreadKey } from "../../slack/key";
 import { deleteSlackThreadData, findSlackThread, slackClient } from "@makers-devops/slack";
 import { PR_닫힘 } from "@makers-devops/slack-blocks";
@@ -9,7 +9,7 @@ import { selectReviewers } from "../../github/review";
 import { config } from "../../config";
 
 type HandledAction = (typeof HANDLED_ACTIONS)[number];
-const HANDLED_ACTIONS = ["opened", "reopened", "closed"] as const;
+const HANDLED_ACTIONS = ["opened", "reopened", "closed", "review_requested"] as const;
 
 const handlePullRequestClosed = async (_req: Request, res: Response, pullRequest: PullRequest) => {
   const key = getPullRequestThreadKey(pullRequest);
@@ -39,6 +39,31 @@ const handlePullRequestClosed = async (_req: Request, res: Response, pullRequest
   return res.json({ success: true, message: "Pull request closed." });
 };
 
+const handlePullRequestReRequested = async (req: Request, res: Response) => {
+  const payload = pullRequestReviewRequestedSchema.parse(req.body);
+
+  const senderLogin = payload.sender.login;
+  const reviewerLogin = payload.requested_reviewer.login;
+
+  const sender = config.frontend.admins.find((admin) => admin.github === senderLogin);
+  const reviewer = config.frontend.admins.find((admin) => admin.github === reviewerLogin);
+
+  if (!sender || !reviewer) {
+    return res.json({ success: false, message: "Sender or reviewer is not admin user" });
+  }
+
+  const result = await createPullRequestReRequestedReply(payload, {
+    senderId: sender.slack,
+    reviewerId: reviewer.slack,
+  });
+
+  if (!result) {
+    return res.json({ success: false, message: "Slack thread reply failed" });
+  }
+
+  return res.json({ success: true, message: "Review requested processed successfully", result });
+};
+
 export const handlePullRequest = async (req: Request, res: Response) => {
   const pullRequest = pullRequestSchema.parse(req.body);
 
@@ -48,6 +73,10 @@ export const handlePullRequest = async (req: Request, res: Response) => {
 
   if (pullRequest.action === "closed") {
     return await handlePullRequestClosed(req, res, pullRequest);
+  }
+
+  if (pullRequest.action === "review_requested") {
+    return await handlePullRequestReRequested(req, res);
   }
 
   const authorLogin = pullRequest.pull_request.user.login;
