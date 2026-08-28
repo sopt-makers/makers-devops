@@ -7,11 +7,6 @@
         "slack": "U07HP891PQW"
       },
       {
-        "name": "남다은",
-        "github": "namdaeun",
-        "slack": "U08EL9ABEPK"
-      },
-      {
         "name": "이진혁",
         "github": "constantly-dev",
         "slack": "U09CF6MG3SS"
@@ -32,9 +27,19 @@
         "slack": "U0AH3773LG3"
       },
       {
-        "name": "장정안",
-        "github": "ExceptAnyone",
-        "slack": "U0AGU5C6E87"
+        "name": "박진석",
+        "github": "jin-evergreen",
+        "slack": "U0BRL8VAYBW"
+      },
+      {
+        "name": "장민수",
+        "github": "Tnalxmsk",
+        "slack": "U0BREKXDKK8"
+      },
+      {
+        "name": "지민재",
+        "github": "mimizae",
+        "slack": "U0BRJGL7789"
       }
     ],
     "repos": [
@@ -49,14 +54,6 @@
   },
   "design": {
     "admins": [
-      {
-        "name": "이유지",
-        "slack": "U08EL9AT56D"
-      },
-      {
-        "name": "장린",
-        "slack": "U09CF6WUZ2S"
-      },
       {
         "name": "손은서",
         "slack": "U04QEPWDVA9"
@@ -80,6 +77,18 @@
       {
         "name": "이재영",
         "slack": "U08E51Z5NR3"
+      },
+      {
+        "name": "유준현",
+        "slack": "U0BRJGP5QCR"
+      },
+      {
+        "name": "최동욱",
+        "slack": "U0BRJGQJ7LZ"
+      },
+      {
+        "name": "주혜진",
+        "slack": "U0BR17A6RV5"
       }
     ]
   }
