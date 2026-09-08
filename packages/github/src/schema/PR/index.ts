@@ -31,3 +31,4 @@ export const pullRequestSchema = z.object({
 });
 
 export { type PullRequestReviewComment, pullRequestReviewCommentSchema } from "./review-comment";
+export { type PullRequestReviewRequested, pullRequestReviewRequestedSchema } from "./review-request";
