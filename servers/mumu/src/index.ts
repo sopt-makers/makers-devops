@@ -17,6 +17,7 @@ const necessaryEnvVars = [
   "SLACK_BOT_TOKEN",
   "SLACK_APP_TOKEN",
   "GITHUB_TOKEN",
+  "GITHUB_WEBHOOK_SECRET",
   "GEMINI_API_KEY",
 ] as const;
 
@@ -33,10 +34,9 @@ app.use(
   }),
 );
 
-/** 요청 JSON 바디 파싱 */
-app.use(express.json());
-
+// 원본 요청 본문으로 GitHub 서명을 검증한 뒤 JSON을 파싱합니다.
 app.use("/api", createWebhookRouter());
+app.use(express.json());
 
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
