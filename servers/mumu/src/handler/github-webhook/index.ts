@@ -9,6 +9,7 @@ import { processCrewPlaygroundProductionDeployment } from "./deployment/process"
 import { handlePullRequestReviewComment } from "./pull_request-review-comment";
 import { handlePullRequest } from "./pull_request";
 
+const GITHUB_SIGNATURE_PREFIX = "sha256=";
 const GITHUB_SIGNATURE_PATTERN = /^sha256=[a-f0-9]{64}$/;
 
 export const handleGithubWebhook = async (req: Request, res: Response) => {
@@ -107,7 +108,7 @@ export function isValidSignature(body: Buffer, signature: string | undefined, se
   if (!signature || !GITHUB_SIGNATURE_PATTERN.test(signature)) return false;
 
   const expected = createHmac("sha256", secret).update(body).digest();
-  const actual = Buffer.from(signature.slice(7), "hex");
+  const actual = Buffer.from(signature.slice(GITHUB_SIGNATURE_PREFIX.length), "hex");
 
   return actual.length === expected.length && timingSafeEqual(actual, expected);
 }
