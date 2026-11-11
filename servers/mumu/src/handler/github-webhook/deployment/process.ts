@@ -39,11 +39,13 @@ export async function processCrewPlaygroundProductionDeployment(key: string): Pr
 
     if (!event || event.status === "sent") return;
 
-    event.status = "processing";
+    event = { ...event, status: "processing" };
     await saveEvent(event);
 
+    const prepared = event.prepared ?? (await prepareDeploymentMessage(event));
+
     if (!event.prepared) {
-      event.prepared = await prepareDeploymentMessage(event);
+      event = { ...event, prepared };
 
       await saveEvent(event);
     }
@@ -55,8 +57,8 @@ export async function processCrewPlaygroundProductionDeployment(key: string): Pr
     }
 
     const response = await slackClient.chat.postMessage({
-      channel: event.prepared.channel,
-      ...event.prepared.message,
+      channel: prepared.channel,
+      ...prepared.message,
       link_names: false,
       parse: "none",
       unfurl_links: false,
@@ -65,9 +67,8 @@ export async function processCrewPlaygroundProductionDeployment(key: string): Pr
 
     if (!response.ok || !response.ts) throw new Error("Slack did not confirm delivery");
 
-    event.status = "sent";
-    event.message_ts = response.ts;
-    delete event.error;
+    const { error: _previousError, ...eventWithoutError } = event;
+    event = { ...eventWithoutError, status: "sent", prepared, message_ts: response.ts };
 
     await saveEvent(event);
   } catch (error) {
@@ -82,8 +83,7 @@ export async function processCrewPlaygroundProductionDeployment(key: string): Pr
     console.error(`[deployment ${key}] processing failed: ${message}`);
 
     if (event) {
-      event.status = "failed";
-      event.error = message;
+      event = { ...event, status: "failed", error: message };
 
       try {
         await saveEvent(event);
