@@ -8,8 +8,7 @@ export type ChangedFile = {
 export function classifyFiles(files: ChangedFile[]): { services: Service[]; unclassified: boolean } {
   let hasCrewChanges = false;
   let hasPlaygroundChanges = false;
-  let unclassified = false;
-  let hasLockfile = false;
+  let hasUnclassifiedChanges = false;
 
   for (const file of files) {
     for (const path of [file.filename, file.previous_filename]) {
@@ -25,16 +24,16 @@ export function classifyFiles(files: ChangedFile[]): { services: Service[]; uncl
       else if (path.startsWith("packages/ui/") || path.startsWith("packages/constant/")) {
         hasCrewChanges = true;
         hasPlaygroundChanges = true;
-      } else if (path === "yarn.lock") hasLockfile = true;
-      else unclassified = true;
+      } else if (path !== "yarn.lock") hasUnclassifiedChanges = true;
     }
   }
-
-  if (hasLockfile && !hasCrewChanges && !hasPlaygroundChanges) unclassified = true;
 
   const services: Service[] = [];
   if (hasCrewChanges) services.push("crew");
   if (hasPlaygroundChanges) services.push("playground");
+
+  const hasChangedPaths = files.some((file) => Boolean(file.filename || file.previous_filename));
+  const unclassified = hasUnclassifiedChanges || (hasChangedPaths && services.length === 0);
 
   return { services, unclassified };
 }
