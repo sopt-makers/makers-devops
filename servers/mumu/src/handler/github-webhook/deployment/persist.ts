@@ -31,20 +31,39 @@ export async function persistDeployment(service: Service, payload: WorkflowRun):
     status: "pending",
   };
 
-  const stored = await redisClient.set(key, event, { nx: true, ex: EVENT_RETENTION_SECONDS });
-  let saved: DeploymentEvent | null = event;
+  const saved = await getOrCreateDeploymentEvent(key, event);
 
-  if (!stored) saved = await redisClient.get<DeploymentEvent>(key);
+  await updateDeploymentStateIfNewer(serviceKey, previous, saved);
+
+  return key;
+}
+
+/** 중복 이벤트는 최초 저장된 비교 기준과 처리 상태를 재사용합니다. */
+async function getOrCreateDeploymentEvent(key: string, event: DeploymentEvent): Promise<DeploymentEvent> {
+  const stored = await redisClient.set(key, event, { nx: true, ex: EVENT_RETENTION_SECONDS });
+
+  if (stored) return event;
+
+  const saved = await redisClient.get<DeploymentEvent>(key);
 
   if (!saved) throw new Error();
 
-  const run = saved.payload.workflow_run;
+  return saved;
+}
+
+/** 이벤트의 완료 시각이 기존 상태보다 최신인 경우에만 갱신합니다. */
+async function updateDeploymentStateIfNewer(
+  serviceKey: string,
+  previous: { completed_at: string } | null,
+  event: DeploymentEvent,
+): Promise<void> {
+  const run = event.payload.workflow_run;
 
   const isNewerDeployment = !previous || Date.parse(previous.completed_at) < Date.parse(run.updated_at);
 
   if (isNewerDeployment) {
     const state = {
-      release_sha: saved.release_sha,
+      release_sha: event.release_sha,
       run_id: run.id,
       run_attempt: run.run_attempt,
       completed_at: run.updated_at,
@@ -56,6 +75,4 @@ export async function persistDeployment(service: Service, payload: WorkflowRun):
       throw new Error();
     }
   }
-
-  return key;
 }
